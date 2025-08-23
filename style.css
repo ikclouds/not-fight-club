@@ -1,0 +1,169 @@
+:root {
+  --bg-color: white;
+  --main-color: black;
+  --button-color: #ff4c4c;
+  --button-hover-color: #e03e3e;
+
+  --odd-bg-color: #f5f5f5;
+  --fight-button-text-color: #f5f5f5;
+  --score-character-text-color: #ff4c4c;
+  --enemy-text-color: #ff4c4c;
+
+  --form-bg-color: white;
+  --blur-color: rgba(0, 0, 0, 0.1);
+  --margin-color: #333;
+  --hp-bar-bg: #ddd;
+  --hp-bar-color: #2ecc71;
+  --hp-bar-low: #e74c3c;
+  --log-bg-color: #f9f9f9;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.page {
+  font-family: Roboto, sans-serif;
+  font-size: 1.1rem;
+  font-weight: normal;
+  overflow-x: hidden;
+}
+
+/* Overlay Start */
+
+.page__overlay {
+    position: fixed;
+    display: none;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.page__overlay__active {
+    display: block;
+}
+
+/* Overlay End */
+
+/* Header and Navigation Start */
+
+.header {
+  position: fixed;
+  width: 100%;
+  background-color: var(--bg-color);
+  border-bottom: 2px solid var(--margin-color);
+  color: var(--main-color);
+  z-index: 1000;
+}
+
+.header__navigation {
+  display: flex; 
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  line-height: 2rem;
+}
+
+.navigation__active-item {
+  letter-spacing: 4px;
+  color: var(--main-color);
+}
+
+/* Battle controls in header Start */
+
+.battle-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-left: 2rem;
+}
+
+.battle-control {
+  padding: 5px 15px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--button-color);
+  color: white;
+  cursor: pointer;
+}
+
+.battle-control:hover {
+  background-color: var(--button-hover-color);
+}
+
+/* Battle controls in header End */
+
+.navigation__menu {
+  display: flex;
+}
+
+.navigation__item {
+  margin-left: 2rem;
+}
+
+.navigation__link {
+  text-decoration: none;
+  color: var(--main-color);
+}
+
+.navigation__link:hover {
+    text-decoration: underline;
+}
+
+
+/* Burger Menu Icon */
+
+.navigation__burger {
+  z-index: 1001;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+}
+
+.burger__line {
+  width: 100%;
+  height: 3px;
+  background-color: var(--main-color);
+  transition: all 0.3s ease;
+}
+
+/* Burger Menu Active (X) */
+.burger_line:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.burger__line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger__line:nth-child(3) {
+  transform: translateY(-9px) rotate(45deg);
+}
+
+/* Header and Navigation End */
+
+
+/* Main Content */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  padding-top: 5rem;
+}
