@@ -144,8 +144,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show the selected form
     form.classList.add('active');
     if (focus) {
-      // form.querySelector(focus).focus();
-      form.querySelector('.form__input').focus();
+      form.querySelector(focus).focus();
+      // form.querySelector('.form__input').focus();
     }
 
   }
@@ -270,5 +270,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       checkLoginState();
   });
+
+  // Settings functionality
+
+  const settingsForm = document.querySelector('.settings-form');
+
+  document.querySelector('.settings-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    showForm(settingsForm, '.form__close');
+  });
+  
 
 });

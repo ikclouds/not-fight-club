@@ -187,7 +187,7 @@
   width: 100%;
   height: 100%;
   display: none;
-  background-color: var(--blur-color);
+  background-color: var(--blur-color);  
 }
 
 .form_container.active {
@@ -200,7 +200,10 @@
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
+  max-height: 600px;
   background-color: var(--form-bg-color);
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
 }
 
 .form__close {
@@ -284,6 +287,33 @@
   font-size: 0.9rem;
   text-align: center;
   color: red;
+}
+
+.settings-actions {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.edit-character-button,
+.select-avatar-button,
+.select-enemy-button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 50%;
+  line-height: 2.5rem;
+  font-size: 1.5rem;
+  color: var(--fight-button-text-color);
+}
+
+.button-icon {
+  width: 60px;
+  height: 60px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 /* Forms End */
