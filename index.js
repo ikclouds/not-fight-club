@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Define helper functions before they're used
+  // Define helper functions
 
   function getCharacterNames() {
     return JSON.parse(localStorage.getItem('nfcCharacterNames')) || [];
@@ -323,6 +323,131 @@ document.addEventListener('DOMContentLoaded', function() {
     populateScoreForm(currentCharacter);
     
     showForm(scoreForm, '.form__close');
+  });
+
+  // Character settings functionality
+
+  const characterForm = document.querySelector('.character-form');
+
+  function autoFillCharacterSettings() {
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    if (currentCharacter) {
+      // Populate character form with current user data
+      // document.getElementById('character-name').value = currentCharacter;
+      document.querySelector('.edit-character-name').value = currentCharacter;
+      
+      // Get password and pre-fill password fields with asterisks if exists
+      const passwords = getCharacterPasswords();
+      const currentPassword = passwords[currentCharacter];
+      
+      if (currentPassword) {
+          const maskedPassword = '*'.repeat(currentPassword.length);
+          // document.getElementById('character-password').value = maskedPassword;
+          document.querySelector('.edit-character-password').value = maskedPassword;
+          document.querySelector('.edit-character-repeat-password').value = maskedPassword;
+
+          // Store original password in a data attribute for later use
+          document.querySelector('.edit-character-password').dataset.originalPassword = currentPassword;
+      } else {
+          document.querySelector('.edit-character-password').value = '';
+          document.querySelector('.edit-character-repeat-password').value = '';
+          delete document.querySelector('.edit-character-password').dataset.originalPassword;
+      }
+      
+      // Set avatar image
+      const avatars = getCharacterAvatars();
+      const characterAvatar = avatars[currentCharacter] || 'default.png';
+      document.getElementById('character-avatar').src = `./assets/img/avatars/${characterAvatar}`;
+    }
+  }
+
+
+  document.querySelector('.edit-character-button').addEventListener('click', function() {
+    autoFillCharacterSettings();
+    showForm(characterForm);
+  });
+
+  function updateCharacter(oldName, newName, newPassword) {
+        const names = getCharacterNames();
+        const passwords = getCharacterPasswords();
+        const avatars = getCharacterAvatars();
+        
+        // Update name if changed
+        if (oldName !== newName) {
+            const index = names.indexOf(oldName);
+            if (index !== -1) {
+                names[index] = newName;
+            }
+            
+            // Update password and avatar entries with new name
+            passwords[newName] = newPassword;
+            avatars[newName] = avatars[oldName] || 'default.png';
+            
+            delete passwords[oldName];
+            delete avatars[oldName];
+        } else {
+            // Just update password
+            passwords[oldName] = newPassword;
+        }
+
+        localStorage.setItem('nfcCharacterNames', JSON.stringify(names));
+        localStorage.setItem('nfcCharacterPasswords', JSON.stringify(passwords));
+        localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
+    }
+
+  document.querySelector('.character-save-button').addEventListener('click', function() {
+      const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+      const newName = document.querySelector('.edit-character-name').value.trim();
+      const passwordField = document.querySelector('.edit-character-password');
+      const repeatPasswordField = document.querySelector('.edit-character-repeat-password');
+      const password = passwordField.value;
+      const repeatPassword = repeatPasswordField.value;
+      const characterMessage = document.querySelector('.character-message');
+      
+      if (!newName || !password || !repeatPassword) {
+          characterMessage.textContent = 'Please fill all fields';
+          return;
+      }
+      
+      if (password !== repeatPassword) {
+          characterMessage.textContent = 'Passwords do not match';
+          return;
+      }
+      
+      if (newName !== currentCharacter && characterExists(newName)) {
+          characterMessage.textContent = 'Character name already taken';
+          return;
+      }
+      
+      // Determine which password to use
+      let passwordToSave;
+      const originalPassword = passwordField.dataset.originalPassword;
+      
+      // If both password fields are filled with asterisks and same length as original,
+      // use the original password, otherwise use the new one
+      if (originalPassword && 
+          password === '*'.repeat(originalPassword.length) && 
+          repeatPassword === '*'.repeat(originalPassword.length)) {
+          passwordToSave = originalPassword;
+      } else {
+          passwordToSave = password;
+      }
+      
+      // Update character
+      updateCharacter(currentCharacter, newName, passwordToSave);
+      characterMessage.textContent = 'Character updated successfully';
+      
+      // Update current character in session storage
+      sessionStorage.setItem('nfcCurrentCharacter', newName);
+      
+      // Clear form fields
+      setTimeout(() => {
+          passwordField.value = '';
+          repeatPasswordField.value = '';
+          delete passwordField.dataset.originalPassword;
+          characterMessage.textContent = '';
+          characterForm.classList.remove('active');
+      }, formCloseTimeout);
   });
 
 });

@@ -318,6 +318,11 @@
   vertical-align: middle;
 }
 
+.character-form .form {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
 /* Score form */
 
 .score-content {
