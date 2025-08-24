@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.remove('page_overlay_active');
 
     // Also close any open forms when clicking overlay
-    document.querySelectorAll('.form-container').forEach(form => {
+    document.querySelectorAll('.form-container,.active').forEach(form => {
         form.classList.remove('active');
     });
   }
@@ -42,7 +42,15 @@ document.addEventListener('DOMContentLoaded', function() {
     closeForms();
   });
 
+  // Close forms on window resize > 1440
   window.onresize = closeFormsOnResize;
+
+  // Close forms on Escape key
+  window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeForms();
+    }
+  });
 
   // Smooth scrolling for menu items
   menuLinks.forEach(link => {
