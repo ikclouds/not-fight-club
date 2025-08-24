@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const activeItemDisplay = document.querySelector('.navigation__active-item');
   const fightLink = document.querySelector('.fight-link');
 
+  checkLoginState();
+
   // Toggle burger menu
   burgerMenu.addEventListener('click', function() {
     this.classList.toggle('navigation_burger_active');
@@ -84,6 +86,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function getCharacterAvatars() {
       return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+  }
+
+  // Check login state on page load
+  function checkLoginState() {
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    if (currentCharacter) {
+      // User is logged in
+      document.querySelector('.login-link').textContent = 'Logout';
+      document.querySelector('.fight-link').classList.remove('hidden');
+      document.querySelector('.score-link').classList.remove('hidden');
+      document.querySelector('.settings-link').classList.remove('hidden');
+      
+      // Set default active menu item to Fight for logged in users
+      if (!sessionStorage.getItem('nfcActiveMenuItem')) {
+        activeItemDisplay.textContent = 'Fight';
+        sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
+      }
+    } else {
+      // User is not logged in
+      document.querySelector('.login-link').textContent = 'Login';
+      document.querySelector('.fight-link').classList.add('hidden');
+      document.querySelector('.score-link').classList.add('hidden');
+      document.querySelector('.settings-link').classList.add('hidden');
+      
+      // Default to Login for logged out users
+      activeItemDisplay.textContent = 'Fight';
+      sessionStorage.removeItem('nfcActiveMenuItem');
+    }
+    
+    // Restore active menu item from session if available
+    const activeMenuItem = sessionStorage.getItem('nfcActiveMenuItem');
+    if (activeMenuItem) {
+      activeItemDisplay.textContent = activeMenuItem;
+    }
   }
 
   // Form functionality
@@ -163,10 +199,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update UI for logged in state
     document.querySelector('.login-link').textContent = 'Logout';
     document.querySelector('.fight-link').classList.remove('hidden');
+    document.querySelector('.score-link').classList.remove('hidden');
     document.querySelector('.settings-link').classList.remove('hidden');
     
     // Store current user
     sessionStorage.setItem('nfcCurrentCharacter', name);
+    activeItemDisplay.textContent = 'Login';
   });
 
   // Create character functionality
@@ -217,6 +255,20 @@ document.addEventListener('DOMContentLoaded', function() {
       createMessage.textContent = '';
       showForm(loginForm, '.login-name');
     }, formCloseTimeout);
+  });
+
+  // Handle login/logout link
+  document.querySelector('.login-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+      if (currentCharacter) {
+        sessionStorage.removeItem('nfcCurrentCharacter');
+        sessionStorage.removeItem('nfcActiveMenuItem');
+      } else {
+        showForm(loginForm, '.login-name');
+      }
+      checkLoginState();
   });
 
 });
