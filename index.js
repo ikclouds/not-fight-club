@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+  // Form defaults
+  const formCloseTimeout = 1000;
   // Burger menu
   const burgerWidth = 1440; // Width threshold for burger menu
   const burgerMenu = document.querySelector('.navigation__burger');
@@ -15,26 +17,30 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.classList.toggle('page_overlay_active');
   });
 
-  // Remove overlay
-  function removeOverlay() {
-    if (window.innerWidth > burgerWidth) {
-      burgerMenu.classList.remove('navigation_burger_active');
-      menu.classList.remove('navigation_menu_active');
-      overlay.classList.remove('page_overlay_active');
+  // Close forms and menu
+  function closeForms() {
+    burgerMenu.classList.remove('navigation_burger_active');
+    menu.classList.remove('navigation_menu_active');
+    overlay.classList.remove('page_overlay_active');
 
-      // Also close any open forms when clicking overlay
-      document.querySelectorAll('.form-container').forEach(form => {
-          form.classList.remove('active');
-      });
+    // Also close any open forms when clicking overlay
+    document.querySelectorAll('.form-container').forEach(form => {
+        form.classList.remove('active');
+    });
+  }
+
+  function closeFormsOnResize() {
+    if (window.innerWidth > burgerWidth) {
+      closeForms();
     }
   }
 
   // Close menu when clicking outside
   overlay.addEventListener('click', function() {
-    removeOverlay();
+    closeForms();
   });
 
-  window.onresize = removeOverlay;
+  window.onresize = closeFormsOnResize;
 
   // Smooth scrolling for menu items
   menuLinks.forEach(link => {
@@ -42,21 +48,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         // Close the menu
-        burgerMenu.classList.remove('navigation_burger_active');
-        menu.classList.remove('navigation_menu_active');
-        overlay.classList.remove('page_overlay_active');
+        closeForms();
 
         // Update active menu item display
         const linkText = this.textContent;
         if (linkText !== 'Login' && linkText !== 'Logout') {
             activeItemDisplay.textContent = linkText;
-            sessionStorage.setItem('nftActiveMenuItem', linkText);
+            sessionStorage.setItem('nfcActiveMenuItem', linkText);
         }
 
         // Handle from links
         const targetId = this.getAttribute('href');
         if (targetId === '#login') {
-            showForm(document.querySelector('.login-form'));
+            showForm(document.querySelector('.login-form'), '.login-name');
             return;
         }
 
@@ -78,6 +82,10 @@ document.addEventListener('DOMContentLoaded', function() {
       return JSON.parse(localStorage.getItem('nfcCharacterPasswords')) || {};
   }
 
+  function getCharacterAvatars() {
+      return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+  }
+
   // Form functionality
 
   const closeBtns = document.querySelectorAll('.form__close');
@@ -90,33 +98,45 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   });
 
-  const loginForm = document.querySelector('.login-form');
-
   // Show form helper
-  function showForm(form) {
+  function showForm(form, focus) {
     // Hide all form first
-    document.querySelectorAll('.form-container').forEach(f => {
+    document.querySelectorAll('form_container,.active').forEach(f => {
       f.classList.remove('active');
     });
 
-    // SHow the selected form
+    // Show the selected form
     form.classList.add('active');
+    if (focus) {
+      // form.querySelector(focus).focus();
+      form.querySelector('.form__input').focus();
+    }
+
   }
 
   // Login functionality
 
-  function checkPassword(name, password) {
-    const passwords = getCharacterPasswords();
-    return passwords[name] === password;
-  }
-
+  const loginForm = document.querySelector('.login-form');
   const loginButton = document.querySelector('.login-button');
   const loginMessage = document.querySelector('.login-message');
   
+  // Create character link
+  document.querySelector('.create-character-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('.create-name').value = document.querySelector('.login-name').value;
+      document.querySelector('.create-password').value = document.querySelector('.login-password').value;
+      showForm(createForm, '.create-name');
+  });
+
   loginButton.addEventListener('click', function() {
-    const name = document.getElementById('login-name').value.trim();
-    const password = document.getElementById('login-password').value;
-    
+    function checkPassword(name, password) {
+      const passwords = getCharacterPasswords();
+      return passwords[name] === password;
+    }
+
+    const name = document.querySelector('.login-name').value.trim();
+    const password = document.querySelector('.login-password').value;
+
     if (!name || !password) {
       loginMessage.textContent = 'Please enter both name and password';
       return;
@@ -125,9 +145,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!characterExists(name)) {
       loginMessage.textContent = 'Character does not exist';
       setTimeout(() => {
-        // showForm(createForm);
+        showForm(createForm);
         document.getElementById('create-name').value = name;
-      }, 1000);
+      }, formCloseTimeout);
       return;
     }
     
@@ -147,6 +167,56 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Store current user
     sessionStorage.setItem('nfcCurrentCharacter', name);
+  });
+
+  // Create character functionality
+  const createForm = document.querySelector('.create-form');
+  const createButton = document.querySelector('.create-button');
+  const createMessage = document.querySelector('.create-message');
+  
+  createButton.addEventListener('click', function() {
+    function addCharacter(name, password) {
+      const names = getCharacterNames();
+      const passwords = getCharacterPasswords();
+      const avatars = getCharacterAvatars();
+      
+      names.push(name);
+      passwords[name] = password;
+      avatars[name] = 'default.png'; // Default avatar
+      
+      localStorage.setItem('nfcCharacterNames', JSON.stringify(names));
+      localStorage.setItem('nfcCharacterPasswords', JSON.stringify(passwords));
+      localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
+    }
+
+    const name = document.querySelector('.create-name').value.trim();
+    const password = document.querySelector('.create-password').value;
+    const repeatPassword = document.querySelector('.create-repeat-password').value;
+
+    if (!name || !password || !repeatPassword) {
+      createMessage.textContent = 'Please fill all fields';
+      return;
+    }
+    
+    if (password !== repeatPassword) {
+      createMessage.textContent = 'Passwords do not match';
+      return;
+    }
+    
+    if (characterExists(name)) {
+      createMessage.textContent = 'Character already exists';
+      return;
+    }
+    
+    // Create character
+    addCharacter(name, password);
+    createMessage.textContent = 'Character created successfully';
+    
+    // Clear form and show login form
+    setTimeout(() => {
+      createMessage.textContent = '';
+      showForm(loginForm, '.login-name');
+    }, formCloseTimeout);
   });
 
 });

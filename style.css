@@ -23,6 +23,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  border: none;
   list-style: none;
 }
 
@@ -207,6 +208,7 @@
   width: 30px;
   height: 30px;
   font-size: 1.5rem;
+  /* border: none; */
   border-radius: 50%;
   background-color: #eee;
   cursor: pointer;

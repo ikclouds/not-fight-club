@@ -42,21 +42,51 @@
   <!-- Login -->
   <div class="form_container login-form">
     <div class="form">
-      <div class="form__close">&times;</div>
+      <button class="form__close">&times;</button>
       <h1 class="form__title">Login</h1>
       <div class="form__group">
-        <label for="login-name" class="form__label">Character Name</label>
-        <input type="text" id="login-name" class="form__input">
+        <label for="login-name" class="form__label">Character Name
+          <input type="text" class="form__input login-name">
+        </label>
       </div>
       <div class="form__group">
-        <label for="login-password" class="form__label">Password</label>
-        <input type="password" id="login-password" class="form__input">
+        <label for="login-password" class="form__label">Password
+          <input type="password" class="form__input login-password">
+        </label>
       </div>
       <div class="form__actions">
         <a href="#" class="form__link create-character-link">Create Character</a>
         <button class="form__button login-button">Login</button>
       </div>
       <div class="form__message login-message"></div>
+    </div>
+  </div>
+
+  
+  <!-- Create Character -->
+  <div class="form_container create-form">
+    <div class="form">
+      <button class="form__close">&times;</button>
+      <h1 class="form__title">Create Character</h1>
+      <div class="form__group">
+        <label for="create-name" class="form__label">Character Name
+          <input type="text" class="form__input create-name">
+        </label>
+      </div>
+      <div class="form__group">
+        <label for="create-password" class="form__label">Password
+          <input type="password" class="form__input create-password">
+        </label>
+      </div>
+      <div class="form__group">
+        <label for="create-repeat-password" class="form__label">Repeat Password
+          <input type="password" class="form__input create-repeat-password">
+        </label>
+      </div>
+      <div class="form__actions">
+        <button class="form__button create-button">Create Character</button>
+      </div>
+      <div class="form__message create-message"></div>
     </div>
   </div>
 
