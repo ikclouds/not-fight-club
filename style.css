@@ -289,6 +289,8 @@
   color: red;
 }
 
+/* Setting form */
+
 .settings-actions {
     display: flex;
     flex-wrap: wrap;
@@ -314,6 +316,54 @@
   height: 60px;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+/* Score form */
+
+.score-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.score-character-name {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--score-character-text-color);
+}
+
+.score-stats {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.score-wins, .score-losses {
+  font-weight: bold;
+  color: var(--button-color);
+}
+
+.avatar-container {
+    position: relative;
+    width: 300px;
+    height: 350px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.avatar-container:hover .avatar-edit-button {
+    opacity: 1;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Forms End */

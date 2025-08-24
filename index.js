@@ -81,11 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function getCharacterPasswords() {
-      return JSON.parse(localStorage.getItem('nfcCharacterPasswords')) || {};
+    return JSON.parse(localStorage.getItem('nfcCharacterPasswords')) || {};
   }
 
   function getCharacterAvatars() {
-      return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+    return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+  }
+
+  function getCharacterScores() {
+    return JSON.parse(localStorage.getItem('notFightClubCharacterScore')) || {};
   }
 
   // Check login state on page load
@@ -279,6 +283,38 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
     showForm(settingsForm, '.form__close');
   });
-  
+
+  // Score functionality
+
+  const scoreForm = document.querySelector('.score-form');
+
+  document.querySelector('.score-link').addEventListener('click', function(e) {
+    // Function to populate the score form with character data
+    function populateScoreForm(characterName) {
+      // Set character name
+      document.querySelector('.score-character-name').textContent = characterName;
+      
+      // Set character avatar
+      const avatars = getCharacterAvatars();
+      const characterAvatar = avatars[characterName] || 'default.png';
+      document.querySelector('.avatar-image').src = `./assets/img/avatars/${characterAvatar}`;
+      
+      // Set character score
+      const scores = getCharacterScores();
+      const characterScore = scores[characterName] || { Win: '0', Loss: '0' };
+      
+      document.querySelector('.score-wins').textContent = characterScore.Win;
+      document.querySelector('.score-losses').textContent = characterScore.Loss;
+    }
+    
+    e.preventDefault();
+    
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+
+    // Populate score form with character data
+    populateScoreForm(currentCharacter);
+    
+    showForm(scoreForm, '.form__close');
+  });
 
 });
