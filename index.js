@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const activeItemDisplay = document.querySelector('.navigation__active-item');
   const fightLink = document.querySelector('.fight-link');
 
+  // Initialize the application
+  initLocalStorage();
   checkLoginState();
 
   // Toggle burger menu
@@ -113,6 +115,79 @@ document.addEventListener('DOMContentLoaded', function() {
     avatars[name] = avatar;
     localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
   }
+
+  function getEnemies() {
+    const enemies = JSON.parse(localStorage.getItem('nfcEnemies')) || {};
+    console.log('Loaded enemies:', enemies); // Debug line
+    return enemies;
+  }
+  
+  function getSelectedEnemyName() {
+    return localStorage.getItem('nfcSelectedEnemyName') || 'Spacemarine';
+  }
+  
+  function getSelectedEnemyHP() {
+    // return localStorage.getItem('nfcSelectedEnemyHP') || '30';
+    return localStorage.getItem('nfcSelectedEnemyHP');
+  }
+  
+  function setSelectedEnemy(name, hp) {
+    localStorage.setItem('nfcSelectedEnemyName', name);
+    localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
+  }
+
+  // Init Local Storage
+  function initLocalStorage() {
+    if (!localStorage.getItem('nfcCharacterNames')) {
+        localStorage.setItem('nfcCharacterNames', JSON.stringify([]));
+    }
+    
+    if (!localStorage.getItem('nfcCharacterPasswords')) {
+        localStorage.setItem('nfcCharacterPasswords', JSON.stringify({}));
+    }
+    
+    // Initialize new storage items
+    if (!localStorage.getItem('nfcCharacterAvatars')) {
+        localStorage.setItem('nfcCharacterAvatars', JSON.stringify({}));
+    }
+    
+    if (!localStorage.getItem('nfcSelectedAvatar')) {
+        localStorage.setItem('nfcSelectedAvatar', 'default.png');
+    }
+    
+    // Initialize enemy storage items
+    if (!localStorage.getItem('nfcEnemies')) {
+        const enemies = {
+            'Spacemarine': 170,
+            'Snowtroll': 150,
+            'Spider': 120
+        };
+        localStorage.setItem('nfcEnemies', JSON.stringify(enemies));
+    }
+    
+    if (!localStorage.getItem('nfcSelectedEnemyName')) {
+        localStorage.setItem('nfcSelectedEnemyName', 'Spacemarine');
+    }
+    
+    if (!localStorage.getItem('nfcSelectedEnemyHP')) {
+        localStorage.setItem('nfcSelectedEnemyHP', '170');
+    }
+    
+    // Initialize HP level storage items
+    if (!localStorage.getItem('nfcCharacterHP')) {
+        localStorage.setItem('nfcCharacterHP', '150');
+    }
+    
+    if (!localStorage.getItem('nfcEnemyHP')) {
+        localStorage.setItem('nfcEnemyHP', '170');
+    }
+    
+    // Initialize character score storage
+    if (!localStorage.getItem('nfcCharacterScore')) {
+        localStorage.setItem('nfcCharacterScore', JSON.stringify({}));
+    }
+  }
+
 
   // Check login state on page load
   function checkLoginState() {
@@ -559,5 +634,99 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
+
+  // Select Enemy
+
+  function loadEnemies() {
+    console.log('Loading enemies...');
+    const enemiesGrid = document.querySelector('.enemies-grid');
+    if (!enemiesGrid) {
+      console.error('Enemies grid not found in the DOM');
+      return;
+    }
+    
+    enemiesGrid.innerHTML = '';
+    
+    try {
+      const enemies = getEnemies();
+      const selectedEnemyName = getSelectedEnemyName();
+      
+      // Create enemy cards
+      Object.entries(enemies).forEach(([name, hp]) => {
+        const enemyCard = document.createElement('div');
+        enemyCard.className = 'enemy-card';
+        if (name === selectedEnemyName) {
+            enemyCard.classList.add('selected');
+        }
+        
+        const enemyName = document.createElement('div');
+        enemyName.className = 'enemy-name';
+        enemyName.textContent = name;
+        
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'fight-image-container';
+        
+        const img = document.createElement('img');
+        img.src = `./assets/img/enemy/${name.toLowerCase().replace(' ', '_')}.png`;
+        img.alt = name;
+        img.className = 'enemy-image';
+        
+        const selectButton = document.createElement('button');
+        selectButton.className = 'enemy-select-button';
+        selectButton.innerHTML = `<img src="./assets/svg/check.svg" alt="Select" class="check-icon">`;
+        
+        const enemyHP = document.createElement('div');
+        enemyHP.className = 'enemy-hp';
+        enemyHP.textContent = `Hit Points: ${hp}`;
+        
+        // Add event listener for selecting an enemy
+        enemyCard.addEventListener('click', function() {
+          document.querySelectorAll('.enemy-card').forEach(card => {
+            card.classList.remove('selected');
+          });
+          enemyCard.classList.add('selected');
+          setSelectedEnemy(name, hp);
+        });
+        
+        selectButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent the card click event
+            document.querySelectorAll('.enemy-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            enemyCard.classList.add('selected');
+            setSelectedEnemy(name, hp);
+        });
+        
+        imageContainer.appendChild(img);
+        imageContainer.appendChild(selectButton);
+        
+        enemyCard.appendChild(enemyName);
+        enemyCard.appendChild(imageContainer);
+        enemyCard.appendChild(enemyHP);
+        
+        enemiesGrid.appendChild(enemyCard);
+      });
+    } catch (error) {
+        console.error('Error loading enemies:', error);
+    }
+  }
+
+  const enemyForm = document.querySelector('.enemy-form');
+
+  document.querySelector('.enemy-save-button').addEventListener('click', function() {
+    enemyForm.classList.remove('active');
+  });
+
+  document.querySelector('.select-enemy-button').addEventListener('click', function() {
+    console.log('Select Enemy button clicked');
+    try {
+        // Load enemies and show the form
+        loadEnemies();
+        showForm(enemyForm, '.form__close');
+    } catch (error) {
+        console.error('Error showing enemy form:', error);
+        alert('Could not load enemy selection. Check console for details.');
+    }
+  });
 
 });
