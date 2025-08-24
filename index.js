@@ -97,7 +97,21 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function getCharacterScores() {
-    return JSON.parse(localStorage.getItem('notFightClubCharacterScore')) || {};
+    return JSON.parse(localStorage.getItem('nfcCharacterScore')) || {};
+  }
+
+  function getCharacterAvatars() {
+    return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+  }
+
+  function setSelectedAvatar(avatar) {
+    localStorage.setItem('nfcClubSelectedAvatar', avatar);
+  }
+
+  function updateCharacterAvatar(name, avatar) {
+    const avatars = getCharacterAvatars();
+    avatars[name] = avatar;
+    localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
   }
 
   // Check login state on page load
@@ -361,10 +375,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-
   document.querySelector('.edit-character-button').addEventListener('click', function() {
     autoFillCharacterSettings();
-    showForm(characterForm);
+    showForm(characterForm, '.edit-character-name');
+  });
+
+  document.querySelector('.avatar-edit-button').addEventListener('click', function() {
+    loadAvatars();
+    showForm(avatarsForm);
   });
 
   function updateCharacter(oldName, newName, newPassword) {
@@ -449,5 +467,97 @@ document.addEventListener('DOMContentLoaded', function() {
           characterForm.classList.remove('active');
       }, formCloseTimeout);
   });
+
+  // Select avatar
+
+  const avatarsForm = document.querySelector('.avatars-form');
+
+  document.querySelector('.select-avatar-button').addEventListener('click', function() {
+    loadAvatars();
+    showForm(avatarsForm);
+  });
+
+  function selectAvatar(avatar) {
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+
+    if (currentCharacter) {
+      // Update avatar in local storage
+      updateCharacterAvatar(currentCharacter, avatar);
+      
+      // Set as selected avatar
+      setSelectedAvatar(avatar);
+      
+      // Update avatar in character form
+      document.getElementById('character-avatar').src = `./assets/img/avatars/${avatar}`;
+      
+      // Close the avatars form
+      avatarsForm.classList.remove('active');
+      
+      // If we came from settings, show character form
+      if (!characterForm.classList.contains('active')) {
+          autoFillCharacterSettings();
+          showForm(characterForm);
+      }
+    }
+  }
+
+  function loadAvatars() {
+    const avatarsGrid = document.querySelector('.avatars-grid');
+    avatarsGrid.innerHTML = '';
+    
+    // Sample avatar filenames - in a real app, these would be loaded from the server
+    const avatarFiles = [
+        'avatar1.png',
+        'avatar2.png',
+        'avatar3.png',
+        'avatar4.png'
+    ];
+    
+    avatarFiles.forEach(file => {
+      const avatarOption = document.createElement('div');
+      avatarOption.className = 'avatar-option';
+      
+      const img = document.createElement('img');
+      img.src = `./assets/img/avatars/${file}`;
+      img.alt = 'Avatar Option';
+      img.className = 'avatar-option-image';
+      
+      const selectButton = document.createElement('button');
+      selectButton.className = 'avatar-select-button';
+      selectButton.innerHTML = `<img src="./assets/svg/check.svg" alt="Select" class="check-icon">`;
+      
+      selectButton.addEventListener('click', function() {
+        selectAvatar(file);
+      });
+      
+      avatarOption.appendChild(img);
+      avatarOption.appendChild(selectButton);
+      avatarsGrid.appendChild(avatarOption);
+    });
+  }
+
+  function selectAvatar(avatar) {
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    
+    if (currentCharacter) {
+      // Update avatar in local storage
+      updateCharacterAvatar(currentCharacter, avatar);
+      
+      // Set as selected avatar
+      setSelectedAvatar(avatar);
+      
+      // Update avatar in character form
+      document.getElementById('character-avatar').src = `./assets/img/avatars/${avatar}`;
+      
+      // Close the avatars form
+      avatarsForm.classList.remove('active');
+      
+      // If we came from settings, show character form
+      if (!characterForm.classList.contains('active')) {
+        autoFillCharacterSettings();
+        showForm(characterForm, '.edit-character-name');
+      }
+    }
+  }
 
 });

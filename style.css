@@ -177,6 +177,18 @@
 
 /* Forms Start */
 
+.check-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
 .form_container {
   z-index: 1100;
   position: fixed;
@@ -311,16 +323,12 @@
   color: var(--fight-button-text-color);
 }
 
-.button-icon {
+.edit-character-button .button-icon,
+.select-avatar-button .button-icon,
+.select-enemy-button .button-icon {
   width: 60px;
   height: 60px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-
-.character-form .form {
-  max-height: 80vh;
-  overflow-y: auto;
+  
 }
 
 /* Score form */
@@ -351,18 +359,22 @@
   color: var(--button-color);
 }
 
+/* Character form */
+
+.character-form .form {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
 .avatar-container {
     position: relative;
-    width: 300px;
-    height: 350px;
+    width: 200px;
+    height: 250px;
     margin: 0 auto;
     border: 1px solid #ccc;
     border-radius: 8px;
+    object-fit: cover;
     overflow: hidden;
-}
-
-.avatar-container:hover .avatar-edit-button {
-    opacity: 1;
 }
 
 .avatar-image {
@@ -370,6 +382,88 @@
     height: 100%;
     object-fit: cover;
 }
+
+.avatar-edit-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+    cursor: pointer;
+}
+
+.avatar-edit-button .edit-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.avatar-container:hover .avatar-edit-button {
+    opacity: 1;
+}
+
+/* Select Avatar */
+
+.avatars-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.avatar-option {
+    position: relative;
+    width: 150px;
+    height: 200px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.avatar-option:hover {
+    border-color: var(--button-color);
+}
+
+.avatar-option-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-select-button {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transition: opacity 0.3s;
+    cursor: pointer;
+}
+
+.avatar-option:hover .avatar-select-button {
+    opacity: 1;
+}
+
 
 /* Forms End */
 
