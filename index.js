@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Form defaults
   const formCloseTimeout = 1000;
+  const fightTimeout = 200;
   // Burger menu
   const burgerWidth = 1440; // Width threshold for burger menu
   const burgerMenu = document.querySelector('.navigation__burger');
@@ -8,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const overlay = document.querySelector('.page__overlay');
   const menuLinks = document.querySelectorAll('.navigation__link');
   const activeItemDisplay = document.querySelector('.navigation__active-item');
-  const fightLink = document.querySelector('.fight-link');
 
   // Initialize the application
   initLocalStorage();
@@ -72,8 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Handle from links
         const targetId = this.getAttribute('href');
         if (targetId === '#login') {
-            showForm(document.querySelector('.login-form'), '.login-name');
-            return;
+          sessionStorage.removeItem('nfcCurrentCharacter');
+          battleInterface.classList.add('hidden');
+          battleControls.classList.add('hidden');
+          showForm(document.querySelector('.login-form'), '.login-name');
+          return;
         }
 
     });
@@ -135,6 +138,25 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('nfcSelectedEnemyName', name);
     localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
   }
+
+  function getCharacterHP() {
+      // return parseInt(localStorage.getItem('nfcCharacterHP')) || 150;
+      return parseInt(localStorage.getItem('nfcCharacterHP'));
+  }
+  
+  function getEnemyHP() {
+      // return parseInt(localStorage.getItem('nfcEnemyHP')) || 30;
+      return parseInt(localStorage.getItem('nfcEnemyHP'));
+  }
+  
+  function setCharacterHP(hp) {
+      localStorage.setItem('nfcCharacterHP', hp.toString());
+  }
+  
+  function setEnemyHP(hp) {
+      localStorage.setItem('nfcEnemyHP', hp.toString());
+  }
+
 
   // Init Local Storage
   function initLocalStorage() {
@@ -222,6 +244,635 @@ document.addEventListener('DOMContentLoaded', function() {
       activeItemDisplay.textContent = activeMenuItem;
     }
   }
+
+  // Fight Start
+
+  // Battle functionality
+  const fightLink = document.querySelector('.fight-link');
+  const battleInterface = document.querySelector('.battle-interface');
+  const fightButton = document.querySelector('.fight-section__fight-button');
+  const battleControls = document.querySelector('.battle-controls');
+  const startButton = document.querySelector('.battle-start');
+  const stopButton = document.querySelector('.battle-stop');
+  const finishButton = document.querySelector('.battle-finish');
+  const attackButton = document.querySelector('.attack-button');
+  const logContainer = document.querySelector('.log-container');
+
+  // Initialize battle UI
+  function initializeBattle() {
+    // Clear log container
+    logContainer.innerHTML = '';
+
+    // Hide fight button and show battle interface
+    fightButton.parentElement.classList.add('hidden');
+    battleInterface.classList.remove('hidden');
+    battleControls.classList.remove('hidden');
+    
+    // Show start button, hide stop and finish buttons
+    startButton.classList.remove('hidden');
+    stopButton.classList.add('hidden');
+    finishButton.classList.add('hidden');
+    
+    // Set up character info
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    const characterName = document.querySelector('.character-name');
+    const characterImage = document.querySelector('.character-image');
+    const characterHP = document.querySelector('.character-hp-text');
+    const characterHPBar = document.querySelector('.character-hp-bar');
+    
+    characterName.textContent = currentCharacter;
+    
+    // Get character avatar
+    const avatars = getCharacterAvatars();
+    const characterAvatar = avatars[currentCharacter] || 'default.png';
+    characterImage.src = `./assets/img/avatars/${characterAvatar}`;
+    
+    // Set up enemy info
+    const enemyName = document.querySelector('.enemy-name');
+    const enemyImage = document.querySelector('.enemy-image');
+    const enemyHP = document.querySelector('.enemy-hp-text');
+    const enemyHPBar = document.querySelector('.enemy-hp-bar');
+    
+    const selectedEnemyName = getSelectedEnemyName();
+    enemyName.textContent = selectedEnemyName;
+    enemyImage.src = `./assets/img/enemy/${selectedEnemyName.toLowerCase().replace(' ', '_')}.png`;
+    
+    // Reset HP
+    const characterMaxHP = 150;
+    const enemyMaxHP = parseInt(getSelectedEnemyHP());
+    
+    setCharacterHP(characterMaxHP);
+    setEnemyHP(enemyMaxHP);
+    
+    // Update HP displays
+    updateHPDisplays(characterMaxHP, enemyMaxHP);
+    
+    // Clear battle log
+    logContainer.innerHTML = '';
+    
+    // Set battle state
+    sessionStorage.setItem('nfcBattleState', 'ready');
+    
+    // Disable attack button initially
+    attackButton.disabled = true;
+    
+    // Initialize attack and defense zone selection
+    initializeZoneSelection();
+  }
+
+  // Start battle
+  startButton.addEventListener('click', function() {
+    console.log("Start battle clicked"); // Debug
+    
+    // Update battle state
+    sessionStorage.setItem('nfcBattleState', 'active');
+    
+    // Update UI
+    document.querySelector('.battle-controls-panel').classList.remove('hidden');
+    startButton.classList.add('hidden');
+    stopButton.classList.remove('hidden');
+    finishButton.classList.remove('hidden');
+    
+    // Update attack button state based on current selections
+    updateAttackButtonState();
+    
+    // Add start message to log
+    addLogEntry('Battle started!', 'result');
+  });
+
+  // Stop battle
+  stopButton.addEventListener('click', function() {
+    // Update battle state
+    sessionStorage.setItem('nfcBattleState', 'paused');
+    
+    // Update UI
+    stopButton.classList.add('hidden');
+    startButton.classList.remove('hidden');
+    
+    // Disable attack button
+    attackButton.disabled = true;
+    
+    // Add pause message to log
+    addLogEntry('Battle paused!', 'result');
+  });
+
+  // Finish battle
+  finishButton.addEventListener('click', function() {
+    // End the battle
+    endBattle('Player forfeited the match.');
+  });
+
+  // Initialize zone selection - Fix event binding issues
+  function initializeZoneSelection() {
+    console.log("Initializing zone selection..."); // Debug
+    const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
+    const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
+    
+    // Clear all selections and remove any existing event listeners
+    attackCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      // Remove existing listeners to prevent duplicates
+      checkbox.removeEventListener('change', validateAttackSelection);
+      // Add the event listener
+      checkbox.addEventListener('change', validateAttackSelection);
+      console.log("Added attack listener to", checkbox.value); // Debug
+    });
+      
+    defenseCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      // Remove existing listeners to prevent duplicates
+      checkbox.removeEventListener('change', validateDefenseSelection);
+      // Add the event listener
+      checkbox.addEventListener('change', validateDefenseSelection);
+      console.log("Added defense listener to", checkbox.value); // Debug
+    });
+    
+    // Ensure attack button is initially disabled but clickable
+    if (attackButton) {
+      attackButton.disabled = true;
+      console.log("Attack button initialized and disabled"); // Debug
+    } else {
+      console.error("Attack button not found in the DOM");
+    }
+  }
+  
+  // Validate attack selection (only one allowed) - Fix validation logic
+  function validateAttackSelection(e) {
+    console.log("Attack selection changed:", e.target.value, e.target.checked); // Debug
+    const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
+    let checkedCount = 0;
+    
+    attackCheckboxes.forEach(checkbox => {
+      if (checkbox !== e.target && e.target.checked) {
+          checkbox.checked = false;
+      }
+      if (checkbox.checked) {
+          checkedCount++;
+      }
+    });
+    
+    // Update attack button state
+    updateAttackButtonState(checkedCount);
+  }
+  
+  // Validate defense selection (only two allowed) - Fix validation logic
+  function validateDefenseSelection(e) {
+    console.log("Defense selection changed:", e.target.value, e.target.checked); // Debug
+    const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
+    let checkedCount = 0;
+    
+    defenseCheckboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+          checkedCount++;
+      }
+    });
+    
+    // If more than 2 are checked, uncheck the last one
+    if (checkedCount > 2) {
+      e.target.checked = false; // Uncheck the one that was just clicked
+      checkedCount = 2;
+      console.log("Unchecked excess defense selection"); // Debug
+    }
+    
+    // Update attack button state
+    updateAttackButtonState(null, checkedCount);
+  }
+  
+  // Centralized function to update attack button state
+  function updateAttackButtonState(attackCount = null, defenseCount = null) {
+    // If values not provided, calculate them
+    if (attackCount === null) {
+      attackCount = document.querySelectorAll('input[name="attack"]:checked').length;
+    }
+    if (defenseCount === null) {
+      defenseCount = document.querySelectorAll('input[name="defense"]:checked').length;
+    }
+    
+    const battleState = sessionStorage.getItem('nfcBattleState');
+    const attackZoneSelected = getSelectedAttackZone() !== null;
+    const shouldBeEnabled = attackCount === 1 && defenseCount === 2 && battleState === 'active' && attackZoneSelected;
+    
+    if (attackButton) {
+      attackButton.disabled = !shouldBeEnabled;
+      console.log(`Attack button state updated: ${shouldBeEnabled ? 'enabled' : 'disabled'}`); // Debug
+      if (!attackZoneSelected && attackCount === 1) {
+          console.log("Attack zone validation issue: zone selection not registering");
+      }
+    }
+  }
+  
+  // Attack button click handler - Fix event handling
+  if (attackButton) {
+    // Remove any existing event listeners to prevent duplicates
+    attackButton.replaceWith(attackButton.cloneNode(true));
+    // Get the new reference after cloning
+    const newAttackButton = document.querySelector('.attack-button');
+    
+    // Add the event listener to the new button
+    newAttackButton.addEventListener('click', function(e) {
+        console.log("Attack button clicked"); // Debug
+        
+        if (sessionStorage.getItem('nfcBattleState') !== 'active') {
+          console.log("Battle not active, attack ignored"); // Debug
+          addLogEntry('Battle not active, click Start!', 'result');
+          return;
+        }
+        
+        const playerAttackZone = getSelectedAttackZone();
+        
+        // Add explicit check for null attack zone
+        if (playerAttackZone === null) {
+          console.log("No attack zone selected"); // Debug
+          addLogEntry('You must select an attack zone!', 'result');
+          return;
+        }
+        
+        const playerDefenseZones = getSelectedDefenseZones();
+        console.log("Player selected:", playerAttackZone, playerDefenseZones); // Debug
+        
+        const enemyZones = getRandomEnemyZones();
+        console.log("Enemy selected:", enemyZones); // Debug
+        
+        // Process player's attack
+        processPlayerAttack(playerAttackZone, enemyZones.defense);
+        
+        // If enemy is still alive, process enemy's attack
+        const enemyHP = getEnemyHP();
+        if (enemyHP > 0) {
+          // Short delay before enemy attacks
+          setTimeout(() => {
+              processEnemyAttack(enemyZones.attack, playerDefenseZones);
+              
+              // Check if battle is over
+              checkBattleEnd();
+          }, fightTimeout);
+        } else {
+          // Player won
+          endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+        }
+    });
+    
+    console.log("New attack button event listener attached"); // Debug
+  }
+  
+  // Initialize zone selection
+  function initializeZoneSelection() {
+    const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
+    const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
+    
+    // Clear all selections
+    attackCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      checkbox.addEventListener('change', validateAttackSelection);
+    });
+    
+    defenseCheckboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      checkbox.addEventListener('change', validateDefenseSelection);
+    });
+  }
+  
+  // Validate attack selection (only one allowed)
+  function validateAttackSelection(e) {
+    const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
+    let checkedCount = 0;
+    
+    attackCheckboxes.forEach(checkbox => {
+      if (checkbox !== e.target && e.target.checked) {
+          checkbox.checked = false;
+      }
+      if (checkbox.checked) {
+          checkedCount++;
+      }
+    });
+    
+    // Make sure at least one attack zone is selected
+    attackButton.disabled = checkedCount !== 1 || getSelectedDefenseZones().length !== 2 || 
+                            sessionStorage.getItem('nfcBattleState') !== 'active';
+  }
+  
+  // Validate defense selection (only two allowed)
+  function validateDefenseSelection() {
+    const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
+    let checkedCount = 0;
+    
+    defenseCheckboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+          checkedCount++;
+      }
+    });
+    
+    // If more than 2 are checked, uncheck the last one
+    if (checkedCount > 2) {
+      // Find the last checked checkbox and uncheck it
+      for (let i = defenseCheckboxes.length - 1; i >= 0; i--) {
+        if (defenseCheckboxes[i].checked) {
+            defenseCheckboxes[i].checked = false;
+            break;
+        }
+      }
+      checkedCount = 2;
+    }
+      
+    // Make sure exactly two defense zones are selected
+    attackButton.disabled = checkedCount !== 2 || getSelectedAttackZone() === null || 
+                            sessionStorage.getItem('nfcBattleState') !== 'active';
+  }
+  
+  // Get selected attack zone
+  function getSelectedAttackZone() {
+    const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
+    for (let checkbox of attackCheckboxes) {
+      if (checkbox.checked) {
+          return checkbox.value;
+      }
+    }
+    return null;
+  }
+  
+  // Get selected defense zones
+  function getSelectedDefenseZones() {
+    const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
+    const selectedZones = [];
+    
+    defenseCheckboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+          selectedZones.push(checkbox.value);
+      }
+    });
+    
+    return selectedZones;
+  }
+  
+  // Generate random zones for enemy
+  function getRandomEnemyZones() {
+    const zones = ['Head', 'Neck', 'Body', 'Belly', 'Legs'];
+    const attackZone = zones[Math.floor(Math.random() * zones.length)];
+    
+    // For defense zones, select 2 unique zones
+    const availableDefenseZones = zones.filter(zone => zone !== attackZone);
+    const shuffled = availableDefenseZones.sort(() => 0.5 - Math.random());
+    const defenseZones = shuffled.slice(0, 2);
+    
+    return {
+        attack: attackZone,
+        defense: defenseZones
+    };
+  }
+  
+  // Attack button click handler
+  attackButton.addEventListener('click', function() {
+    if (sessionStorage.getItem('nfcBattleState') !== 'active') {
+        return;
+    }
+    
+    const playerAttackZone = getSelectedAttackZone();
+    const playerDefenseZones = getSelectedDefenseZones();
+    const enemyZones = getRandomEnemyZones();
+    
+    // Process player's attack
+    processPlayerAttack(playerAttackZone, enemyZones.defense);
+    
+    // If enemy is still alive, process enemy's attack
+    const enemyHP = getEnemyHP();
+    if (enemyHP > 0) {
+      // Short delay before enemy attacks
+      setTimeout(() => {
+        processEnemyAttack(enemyZones.attack, playerDefenseZones);
+        
+        // Check if battle is over
+        checkBattleEnd();
+      }, formCloseTimeout);
+    } else {
+        // Player won
+        endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+    }
+  });
+  
+  // Process player's attack
+  function processPlayerAttack(attackZone, enemyDefenseZones) {
+    const characterName = sessionStorage.getItem('nfcCurrentCharacter');
+    const enemyName = getSelectedEnemyName();
+    const damage = 10; // 10 damage per hit
+    
+    // Add defensive check for null attack zone
+    if (!attackZone) {
+      console.error("Attack zone is null in processPlayerAttack");
+      addLogEntry(`${characterName} failed to attack! No target selected.`, 'result');
+      return;
+    }
+    
+    // Check if attack was defended
+    if (enemyDefenseZones.includes(attackZone)) {
+      // Attack defended
+      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} but ${enemyName} was able to protect his ${attackZone}.`, 'player-attack');
+    } else {
+      // Attack successful
+      const enemyHP = getEnemyHP();
+      const newEnemyHP = Math.max(0, enemyHP - damage);
+      setEnemyHP(newEnemyHP);
+      
+      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} and dealt ${damage} damage.`, 'player-attack');
+      
+      // Update HP displays
+      updateHPDisplays();
+    }
+  }
+  
+  // Process enemy's attack
+  function processEnemyAttack(attackZone, playerDefenseZones) {
+    const characterName = sessionStorage.getItem('nfcCurrentCharacter');
+    const enemyName = getSelectedEnemyName();
+    const damage = 10; // 10 damage per hit
+    
+    // Check if attack was defended
+    if (playerDefenseZones.includes(attackZone)) {
+        // Attack defended
+        addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} but ${characterName} was able to protect his ${attackZone}.`, 'enemy-attack');
+    } else {
+        // Attack successful
+        const characterHP = getCharacterHP();
+        const newCharacterHP = Math.max(0, characterHP - damage);
+        setCharacterHP(newCharacterHP);
+        
+        addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} and dealt ${damage} damage.`, 'enemy-attack');
+        
+        // Update HP displays
+        updateHPDisplays();
+    }
+  }
+  
+  // Check if battle has ended
+  function checkBattleEnd() {
+    const characterHP = getCharacterHP();
+    const enemyHP = getEnemyHP();
+    
+    if (characterHP <= 0) {
+        // Player lost
+        endBattle(`${getSelectedEnemyName()} has defeated ${sessionStorage.getItem('nfcCurrentCharacter')}!`);
+    } else if (enemyHP <= 0) {
+        // Player won
+        endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+    }
+  }
+  
+  // End battle
+  function endBattle(resultMessage) {
+    // Update battle state
+    sessionStorage.setItem('nfcBattleState', 'ended');
+    
+    // Get final HP values
+    const characterName = sessionStorage.getItem('nfcCurrentCharacter');
+    const enemyName = getSelectedEnemyName();
+    const characterHP = getCharacterHP();
+    const enemyHP = getEnemyHP();
+    const characterMaxHP = 150;
+    const enemyMaxHP = parseInt(getSelectedEnemyHP());
+    
+    // Determine result and update character score
+    if (characterHP > 0 && enemyHP <= 0) {
+      // Character won
+      updateCharacterScore(characterName, 'Win');
+      addLogEntry(`${characterName} has Won the battle!`, 'result');
+    } else if (characterHP <= 0 && enemyHP > 0) {
+      // Character lost or it's a draw (both died)
+      updateCharacterScore(characterName, 'Loss');
+      addLogEntry(`${characterName} has Lost the battle.`, 'result');
+    } else if (characterHP > enemyHP) {
+      // Character won
+      updateCharacterScore(characterName, 'Win');
+      addLogEntry(`${characterName} has Won the battle!`, 'result');
+    } else if (characterHP < enemyHP) {
+      // Character lost
+      updateCharacterScore(characterName, 'Loss');
+      addLogEntry(`${characterName} has Lost the battle.`, 'result');
+    } else {
+      // It's a draw
+      addLogEntry(`The battle ended in a draw.`, 'result');
+      updateCharacterScore(characterName, 'Loss');
+      addLogEntry(`${characterName} has Lost the battle.`, 'result');
+    }
+    
+    // Add HP summary to log
+    addLogEntry(`Final HP - ${characterName}: ${characterHP}/${characterMaxHP}, ${enemyName}: ${enemyHP}/${enemyMaxHP}`, 'result');
+    
+    // Display character's score
+    const scores = getCharacterScores();
+    const characterScore = scores[characterName] || { Win: '0', Loss: '0' };
+    addLogEntry(`${characterName}'s record: ${characterScore.Win} wins, ${characterScore.Loss} losses`, 'result');
+    
+    // Reset HP values for next battle
+    setCharacterHP(characterMaxHP);
+    setEnemyHP(enemyMaxHP);
+    
+    // Update UI - hide battle interface and show Fight button
+    // showForm(scoreForm);
+    // battleInterface.classList.add('hidden');
+    // battleControls.classList.add('hidden');
+    fightButton.parentElement.classList.remove('hidden');
+    // attackButton.classList.add('hidden');
+    document.querySelector('.battle-controls-panel').classList.add('hidden');
+    
+    // Hide battle control buttons
+    hideBattleButtons();
+    addLogEntry('Battle ended! Press Fight to start a new battle.', 'result');
+  }
+
+  function hideBattleButtons() {
+      battleControls.classList.add('hidden');
+      startButton.classList.add('hidden');
+      stopButton.classList.add('hidden');
+      finishButton.classList.add('hidden');
+  }
+
+  // Update HP displays
+  function updateHPDisplays() {
+    const characterHP = getCharacterHP();
+    const enemyHP = getEnemyHP();
+    const characterMaxHP = 150;
+    const enemyMaxHP = parseInt(getSelectedEnemyHP());
+    
+    // Update text displays
+    document.querySelector('.character-hp-text').textContent = `${characterHP}/${characterMaxHP}`;
+    document.querySelector('.enemy-hp-text').textContent = `${enemyHP}/${enemyMaxHP}`;
+    
+    activeItemDisplay.textContent = 'Fight';
+    sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
+
+    // Update HP bars
+    const characterHPBar = document.querySelector('.character-hp-bar');
+    const enemyHPBar = document.querySelector('.enemy-hp-bar');
+    
+    characterHPBar.style.width = `${(characterHP / characterMaxHP) * 100}%`;
+    enemyHPBar.style.width = `${(enemyHP / enemyMaxHP) * 100}%`;
+    
+    // Add 'low' class if HP is below 30%
+    if (characterHP / characterMaxHP < 0.3) {
+      characterHPBar.classList.add('low');
+    } else {
+      characterHPBar.classList.remove('low');
+    }
+    
+    if (enemyHP / enemyMaxHP < 0.3) {
+      enemyHPBar.classList.add('low');
+    } else {
+      enemyHPBar.classList.remove('low');
+    }
+  }
+  
+  // Add entry to battle log
+  function addLogEntry(message, className = '') {
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry ${className}`;
+    logEntry.textContent = message;
+    
+    logContainer.appendChild(logEntry);
+    
+    // Scroll to bottom
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+
+  // Fight link functionality
+  fightLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    // Initialize the fight
+    initializeBattle();
+  });
+
+  // Handle fight button click
+  document.querySelector('.fight-section__fight-button').addEventListener('click', function() {
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    if (!currentCharacter) {
+      // User is not logged in, show login form
+      showForm(loginForm);
+    } else {
+      // User is logged in, start the fight
+      initializeBattle();
+    }
+  });
+
+  function updateCharacterScore(characterName, result) {
+    const scores = getCharacterScores();
+    
+    // Initialize character's score record if it doesn't exist
+    if (!scores[characterName]) {
+      scores[characterName] = {
+        Win: '0',
+        Loss: '0'
+      };
+    }
+    
+    // Increment the appropriate counter
+    const currentValue = parseInt(scores[characterName][result]) || 0;
+    scores[characterName][result] = (currentValue + 1).toString();
+    
+    // Save updated scores
+    localStorage.setItem('nfcCharacterScore', JSON.stringify(scores));
+    
+    console.log(`Updated score for ${characterName}: ${JSON.stringify(scores[characterName])}`);
+  }
+
+  // Fight End
 
   // Form functionality
 
@@ -366,8 +1017,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (currentCharacter) {
         sessionStorage.removeItem('nfcCurrentCharacter');
         sessionStorage.removeItem('nfcActiveMenuItem');
-      } else {
-        showForm(loginForm, '.login-name');
       }
       checkLoginState();
   });

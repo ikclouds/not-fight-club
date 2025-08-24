@@ -12,11 +12,14 @@
 <body class="page">
   <header class="header">
     <nav class="header__navigation">
-      <div class="battle-controls hidden">
+      <div class="navigation">
+        <h1 class="navigation__logo">Not Fight Club</h1>
         <div class="navigation__active-item">Fight</div>
-        <button class="battle-control battle-start hidden">Start</button>
-        <button class="battle-control battle-stop hidden">Stop</button>
-        <button class="battle-control battle-finish hidden">Finish</button>
+        <div class="battle-controls hidden">
+          <button class="battle-control battle-start hidden">Start</button>
+          <button class="battle-control battle-stop hidden">Stop</button>
+          <button class="battle-control battle-finish hidden">Finish</button>
+        </div>
       </div>
       <ul class="navigation__menu">
         <li class="navigation__item fight-link hidden"><a href="#fight" class="navigation__link">Fight</a></li>
@@ -32,10 +35,80 @@
     </nav>
   </header>
 
+  <!-- Fight -->
+
   <main class="fight">
-    <section class="main__content">
-      <h1>Welcome to Not Fight Club</h1>
-      <p>This is a demo application for managing fights and scores.</p>
+    <!-- Fight section with battle panel and logging panel -->
+    <section id="fight" class="fight__section section fight-section">
+      <div class="battle-interface hidden">
+        <div class="battle-panel">
+          <!-- Character Side -->
+          <div class="battle-character">
+            <h2 class="character-name">Character Name</h2>
+            <div class="fight-image-container">
+              <img src="./assets/img/avatars/default.png" alt="Character" class="character-image">
+            </div>
+            <div class="hp-bar-container">
+              <div class="hp-bar character-hp-bar"></div>
+            </div>
+            <div class="hp-text character-hp-text">0/0</div>
+          </div>
+
+          <!-- Battle Controls - Fix to ensure elements are clickable -->
+          <div class="battle-controls-panel">
+            <div class="instruction">Please pick 1 Attack zone and 2 Defense zones</div>
+            <div class="zones-selection">
+              <div class="attack-zones">
+                <h3>Attack Zones</h3>
+                <label class="attack-zone-item"><span>Head</span><input type="checkbox" name="attack" value="Head"
+                    id="attack-head"></label>
+                <label class="attack-zone-item"><span>Neck</span><input type="checkbox" name="attack" value="Neck"
+                    id="attack-neck"></label>
+                <label class="attack-zone-item"><span>Body</span><input type="checkbox" name="attack" value="Body"
+                    id="attack-body"></label>
+                <label class="attack-zone-item"><span>Belly</span><input type="checkbox" name="attack" value="Belly"
+                    id="attack-belly"></label>
+                <label class="attack-zone-item"><span>Legs</span><input type="checkbox" name="attack" value="Legs"
+                    id="attack-legs"></label>
+              </div>
+              <div class="fight-margin"></div>
+              <div class="defense-zones">
+                <h3>Defense Zones</h3>
+                <label><input type="checkbox" name="defense" value="Head" id="defense-head"> <span>Head</span></label>
+                <label><input type="checkbox" name="defense" value="Neck" id="defense-neck"> <span>Neck</span></label>
+                <label><input type="checkbox" name="defense" value="Body" id="defense-body"> <span>Body</span></label>
+                <label><input type="checkbox" name="defense" value="Belly" id="defense-belly">
+                  <span>Belly</span></label>
+                <label><input type="checkbox" name="defense" value="Legs" id="defense-legs"> <span>Legs</span></label>
+              </div>
+            </div>
+            <button class="attack-button" type="button">Attack</button>
+          </div>
+
+          <!-- Enemy Side -->
+          <div class="battle-enemy">
+            <h2 class="enemy-name">Enemy Name</h2>
+            <div class="fight-image-container">
+              <img src="./assets/img/enemy/spacemarine.png" alt="Enemy" class="enemy-image">
+            </div>
+            <div class="hp-bar-container">
+              <div class="hp-bar enemy-hp-bar"></div>
+            </div>
+            <div class="hp-text enemy-hp-text">0/0</div>
+          </div>
+        </div>
+
+        <!-- Logging Panel -->
+        <div class="logging-panel">
+          <!-- <div class="log-title">Battle Log</div> -->
+          <div class="log-container"></div>
+        </div>
+      </div>
+
+      <!-- Initial fight button (shown before battle starts) -->
+      <div class="fight-section__content">
+        <button class="fight-section__fight-button">Fight</button>
+      </div>
     </section>
   </main>
 
@@ -61,7 +134,7 @@
       <div class="form__message login-message"></div>
     </div>
   </div>
-  
+
   <!-- Create Character -->
   <div class="form_container create-form">
     <div class="form">
