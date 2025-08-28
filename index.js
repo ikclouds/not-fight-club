@@ -21,6 +21,15 @@ document.addEventListener('DOMContentLoaded', function () {
   const BLOCKED_CRITICAL_DAMAGE = 5;
   const CRITICAL_HIT_CHANCE = 0.3; // 30% chance for a critical hit
 
+  // Double hit settings
+  const DEFAULT_CHARACTER_DH = 0;
+  const ENEMY_DOUBLE_HITS = {
+    'Spacemarine': 0,
+    'Snowtroll': 0,
+    'Spider': -1 // -1 means all hits are double
+  };
+  const DOUBLE_HIT_CHANCE = 0.2; // 20% chance for a double hit
+
   // Burger menu
   const burgerMenu = document.querySelector('.navigation__burger');
   const menu = document.querySelector('.navigation__menu');
@@ -155,12 +164,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function setSelectedEnemy(name, hp) {
     localStorage.setItem('nfcSelectedEnemyName', name);
     localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
-    const selectedEnemyName = getSelectedEnemyName();
-    setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
+
+    // Reset critical hits and double hits for the new enemy
+    setEnemyCH(ENEMY_CRITICAL_HITS[name] || 1);
+    setEnemyDH(ENEMY_DOUBLE_HITS[name] || 0);
 
     // Update enemy in battle interface if it's visible
     updateEnemyInBattleInterface(name, hp);
     updateCriticalHitDisplay();
+    updateDoubleHitDisplay();
   }
 
   // Function to update enemy in battle interface when it's changed
@@ -242,6 +254,27 @@ document.addEventListener('DOMContentLoaded', function () {
     return ENEMY_CRITICAL_HITS[enemyName] || 1;
   }
 
+  // Helper functions for double hits
+  function getCharacterDH() {
+    return parseInt(localStorage.getItem('nfcCharacterDH'));
+  }
+
+  function getEnemyDH() {
+    return parseInt(localStorage.getItem('nfcEnemyDH'));
+  }
+
+  function setCharacterDH(count) {
+    localStorage.setItem('nfcCharacterDH', count.toString());
+  }
+
+  function setEnemyDH(count) {
+    localStorage.setItem('nfcEnemyDH', count.toString());
+  }
+
+  function getMaxEnemyDH(enemyName) {
+    return ENEMY_DOUBLE_HITS[enemyName] || 0;
+  }
+
   // Init Local Storage
   function initLocalStorage() {
     if (!localStorage.getItem('nfcCharacterNames')) {
@@ -266,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const enemies = {
         'Spacemarine': 170,
         'Snowtroll': 150,
-        'Spider': 120
+        'Spider': 90
       };
       localStorage.setItem('nfcEnemies', JSON.stringify(enemies));
     }
@@ -302,6 +335,17 @@ document.addEventListener('DOMContentLoaded', function () {
       const selectedEnemy = getSelectedEnemyName();
       const enemyCH = ENEMY_CRITICAL_HITS[selectedEnemy] || 1;
       localStorage.setItem('nfcEnemyCH', enemyCH.toString());
+    }
+
+    // Initialize double hit storage
+    if (!localStorage.getItem('nfcCharacterDH')) {
+      localStorage.setItem('nfcCharacterDH', DEFAULT_CHARACTER_DH.toString());
+    }
+
+    if (!localStorage.getItem('nfcEnemyDH')) {
+      const selectedEnemy = getSelectedEnemyName();
+      const enemyDH = ENEMY_DOUBLE_HITS[selectedEnemy] || 0;
+      localStorage.setItem('nfcEnemyDH', enemyDH.toString());
     }
   }
 
@@ -403,17 +447,20 @@ document.addEventListener('DOMContentLoaded', function () {
       sessionStorage.setItem('nfcBattleState', 'active');
       updateAttackButtonState();
     } else {
-      // Reset critical hits for a new battle
+      // Reset critical hits and double hits for a new battle
       const selectedEnemyName = getSelectedEnemyName();
       setCharacterCH(DEFAULT_CHARACTER_CH);
       setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
+      setCharacterDH(DEFAULT_CHARACTER_DH);
+      setEnemyDH(ENEMY_DOUBLE_HITS[selectedEnemyName] || 0);
 
       // Clear battle log
       logContainer.innerHTML = '';
     }
 
-    // Display critical hit counts
+    // Display critical hit and double hit counts
     updateCriticalHitDisplay();
+    updateDoubleHitDisplay();
 
     // Update HP displays
     updateHPDisplays(characterMaxHP, enemyMaxHP);
@@ -501,6 +548,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     characterHPText.after(characterCHDisplay);
     enemyHPText.after(enemyCHDisplay);
+  }
+
+  // Function to update double hit display
+  function updateDoubleHitDisplay() {
+    const characterDH = getCharacterDH();
+    const enemyDH = getEnemyDH();
+
+    // Add double hit info to the battle interface
+    const characterInfoPanel = document.querySelector('.battle-character');
+    const enemyInfoPanel = document.querySelector('.battle-enemy');
+
+    // Remove existing double hit displays if any
+    const existingCharacterDH = characterInfoPanel.querySelector('.double-hit-count');
+    const existingEnemyDH = enemyInfoPanel.querySelector('.double-hit-count');
+
+    if (existingCharacterDH) existingCharacterDH.remove();
+    if (existingEnemyDH) existingEnemyDH.remove();
+
+    // Create new double hit displays
+    const characterDHDisplay = document.createElement('div');
+    characterDHDisplay.className = 'double-hit-count';
+    characterDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${characterDH === -1 ? "∞" : characterDH}</span>`;
+
+    const enemyDHDisplay = document.createElement('div');
+    enemyDHDisplay.className = 'double-hit-count';
+    enemyDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${enemyDH === -1 ? "∞" : enemyDH}</span>`;
+
+    // Insert after critical hit text
+    const characterCHText = characterInfoPanel.querySelector('.critical-hit-count');
+    const enemyCHText = enemyInfoPanel.querySelector('.critical-hit-count');
+
+    if (characterCHText) {
+      characterCHText.after(characterDHDisplay);
+    } else {
+      const characterHPText = characterInfoPanel.querySelector('.hp-text');
+      characterHPText.after(characterDHDisplay);
+    }
+
+    if (enemyCHText) {
+      enemyCHText.after(enemyDHDisplay);
+    } else {
+      const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
+      enemyHPText.after(enemyDHDisplay);
+    }
   }
 
   // Initialize zone selection - Fix event binding issues
@@ -717,6 +808,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (sessionStorage.getItem('nfcBattleState') !== 'active') {
       return;
     }
+
     // Attack button click handler - Fix event handling
     if (attackButton) {
       console.log("Attack button clicked"); // Debug
@@ -727,33 +819,15 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      const playerAttackZone = getSelectedAttackZone();
-
-      // Add explicit check for null attack zone
-      if (playerAttackZone === null) {
-        console.log("No attack zone selected"); // Debug
-        addLogEntry('You must select an attack zone!', 'result');
-        return;
-      }
-
-      const playerDefenseZones = getSelectedDefenseZones();
-      console.log("Player selected:", playerAttackZone, playerDefenseZones); // Debug
-
-      const enemyZones = getRandomEnemyZones();
-      console.log("Enemy selected:", enemyZones); // Debug
-
       // Process player's attack
-      processPlayerAttack(playerAttackZone, enemyZones.defense);
+      processAttack(true);
 
       // If enemy is still alive, process enemy's attack
       const enemyHP = getEnemyHP();
       if (enemyHP > 0) {
         // Short delay before enemy attacks
         setTimeout(() => {
-          processEnemyAttack(enemyZones.attack, playerDefenseZones);
-
-          // Check if battle is over
-          checkBattleEnd();
+          processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
         }, fightTimeout);
       } else {
         // Player won
@@ -763,6 +837,101 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log("New attack button event listener attached"); // Debug
     }
   });
+
+  // Unified attack processing function to handle double hits
+  function processAttack(isPlayerAttacking = true) {
+    if (isPlayerAttacking) {
+      const playerAttackZone = getSelectedAttackZone();
+      if (playerAttackZone === null) {
+        console.log("No attack zone selected"); // Debug
+        addLogEntry('You must select an attack zone!', 'result');
+        return;
+      }
+
+      const playerDefenseZones = getSelectedDefenseZones();
+      const enemyZones = getRandomEnemyZones();
+
+      // Check if player gets a double hit
+      let doubleHit = false;
+      const characterDH = getCharacterDH();
+
+      if (characterDH === -1 || (characterDH > 0 && Math.random() < DOUBLE_HIT_CHANCE)) {
+        doubleHit = true;
+        if (characterDH > 0) {
+          setCharacterDH(characterDH - 1);
+          updateDoubleHitDisplay();
+        }
+      }
+
+      // Process player's first attack
+      processPlayerAttack(playerAttackZone, enemyZones.defense);
+
+      // If double hit and enemy still alive, do a second attack
+      const enemyHP = getEnemyHP();
+      if (doubleHit && enemyHP > 0) {
+        setTimeout(() => {
+          // Get new enemy defense zones for second attack
+          const newEnemyZones = getRandomEnemyZones();
+          processPlayerAttack(playerAttackZone, newEnemyZones.defense);
+
+          // Continue with enemy attack if enemy still alive
+          const updatedEnemyHP = getEnemyHP();
+          if (updatedEnemyHP > 0) {
+            setTimeout(() => {
+              processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
+            }, fightTimeout);
+          } else {
+            endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+          }
+        }, fightTimeout);
+      } else {
+        // Check if enemy is still alive before enemy attacks
+        if (enemyHP > 0) {
+          setTimeout(() => {
+            processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
+          }, fightTimeout);
+        } else {
+          endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+        }
+      }
+    }
+  }
+
+  // Handle enemy attack with potential double hit
+  function processEnemyAttackWithDoubleHit(attackZone, playerDefenseZones) {
+    // Check if enemy gets a double hit
+    let doubleHit = false;
+    const enemyDH = getEnemyDH();
+
+    if (enemyDH === -1 || (enemyDH > 0 && Math.random() < DOUBLE_HIT_CHANCE)) {
+      doubleHit = true;
+      if (enemyDH > 0) {
+        setEnemyDH(enemyDH - 1);
+        updateDoubleHitDisplay();
+      }
+    }
+
+    // Process enemy's first attack
+    processEnemyAttack(attackZone, playerDefenseZones);
+
+    // If double hit and character still alive, do a second attack
+    const characterHP = getCharacterHP();
+    if (doubleHit && characterHP > 0) {
+      setTimeout(() => {
+        // Get new attack zone for second attack
+        const zones = ['Head', 'Neck', 'Body', 'Belly', 'Legs'];
+        const newAttackZone = zones[Math.floor(Math.random() * zones.length)];
+
+        processEnemyAttack(newAttackZone, playerDefenseZones);
+
+        // Check if battle is over after second attack
+        checkBattleEnd();
+      }, fightTimeout);
+    } else {
+      // Check if battle is over
+      checkBattleEnd();
+    }
+  }
 
   // Process player's attack - Update for critical hits
   function processPlayerAttack(attackZone, enemyDefenseZones) {
@@ -947,11 +1116,13 @@ document.addEventListener('DOMContentLoaded', function () {
     setCharacterHP(characterMaxHP);
     setEnemyHP(enemyMaxHP);
 
-    // Reset critical hits for next battle
+    // Reset critical hits and double hits for next battle
     setCharacterCH(DEFAULT_CHARACTER_CH);
+    setCharacterDH(DEFAULT_CHARACTER_DH);
+
     const selectedEnemyName = getSelectedEnemyName();
     setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
-    // updateCriticalHitDisplay();
+    setEnemyDH(ENEMY_DOUBLE_HITS[selectedEnemyName] || 0);
 
     // Update UI - hide battle interface and show Fight button
     // showForm(scoreForm);
@@ -1289,6 +1460,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Set critical hit value
       document.querySelector('.edit-character-ch').value = getCharacterCH();
+
+      // Set double hit value
+      document.querySelector('.edit-character-dh').value = getCharacterDH();
     }
   }
 
@@ -1370,7 +1544,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update character
     updateCharacter(currentCharacter, newName, passwordToSave);
+
+    // Save critical hit count
+    const chField = document.querySelector('.edit-character-ch');
+    if (chField) {
+      const chValue = parseInt(chField.value) || DEFAULT_CHARACTER_CH;
+      setCharacterCH(chValue);
+    }
+
+    // Save double hit count
+    const dhField = document.querySelector('.edit-character-dh');
+    if (dhField) {
+      const dhValue = parseInt(dhField.value) || DEFAULT_CHARACTER_DH;
+      setCharacterDH(dhValue);
+      console.log("Double hit value saved:", dhValue); // Debug log
+    }
+
     characterMessage.textContent = 'Character updated successfully';
+
+    // Update battle interface if it's visible
+    const battleInterface = document.querySelector('.battle-interface');
+    if (battleInterface && !battleInterface.classList.contains('hidden')) {
+      updateCriticalHitDisplay();
+      updateDoubleHitDisplay();
+    }
 
     // Update current character in session storage
     sessionStorage.setItem('nfcCurrentCharacter', newName);
@@ -1508,6 +1705,12 @@ document.addEventListener('DOMContentLoaded', function () {
         enemyCH.className = 'enemy-ch';
         enemyCH.textContent = `Critical Hits: ${ENEMY_CRITICAL_HITS[name] || 1}`;
 
+        // Add double hit info
+        const enemyDH = document.createElement('div');
+        enemyDH.className = 'enemy-dh';
+        const dhValue = ENEMY_DOUBLE_HITS[name] || 0;
+        enemyDH.textContent = `Double Hits: ${dhValue === -1 ? "∞" : dhValue}`;
+
         // Add event listener for selecting an enemy
         enemyCard.addEventListener('click', function () {
           document.querySelectorAll('.enemy-card').forEach(card => {
@@ -1533,6 +1736,7 @@ document.addEventListener('DOMContentLoaded', function () {
         enemyCard.appendChild(imageContainer);
         enemyCard.appendChild(enemyHP);
         enemyCard.appendChild(enemyCH);
+        enemyCard.appendChild(enemyDH);
 
         enemiesGrid.appendChild(enemyCard);
       });

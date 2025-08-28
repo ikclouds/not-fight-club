@@ -460,7 +460,7 @@
 
 /* Critical Hit Styles */
 .critical-hit-count {
-  display: none;
+  /* display: none; */
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
@@ -478,6 +478,26 @@
 }
 
 .enemy-ch {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--button-color);
+}
+
+/* Double Hit Styles */
+.double-hit-count {
+  /* display: none; */
+  margin-top: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--button-color);
+}
+
+.dh-value {
+  font-weight: bold;
+}
+
+.enemy-dh {
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
