@@ -17,6 +17,8 @@
   --hp-bar-color: #2ecc71;
   --hp-bar-low: #e74c3c;
   --log-bg-color: #f9f9f9;
+  --log-fighter-color: #240474;
+  --log-damage-color: #ff4c4c;
 }
 
 * {
@@ -439,6 +441,20 @@
 .result-win,
 .result-loss {
   color: var(--button-color);
+}
+
+.log_fighter {
+  font-weight: bold;
+  color: var(--log-fighter-color);
+}
+
+.log_damage {
+  font-weight: bold;
+  color: var(--log-damage-color);
+}
+
+.log_enemy_attack {
+  color: var(--enemy-text-color);
 }
 
 /* Fight End */
