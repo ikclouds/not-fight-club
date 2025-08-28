@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
   const fightTimeout = 200;
   // Burger menu
   const burgerWidth = 1440; // Width threshold for burger menu
+
+  // Combat settings
+  const REQUIRED_ATTACK_ZONES = 1;
+  const REQUIRED_DEFENSE_ZONES = 2;
+
   const burgerMenu = document.querySelector('.navigation__burger');
   const menu = document.querySelector('.navigation__menu');
   const overlay = document.querySelector('.page__overlay');
@@ -427,10 +432,10 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // If more than 2 are checked, uncheck the last one
-    if (checkedCount > 2) {
+    // If more than required are checked, uncheck the last one
+    if (checkedCount > REQUIRED_DEFENSE_ZONES) {
       e.target.checked = false; // Uncheck the one that was just clicked
-      checkedCount = 2;
+      checkedCount = REQUIRED_DEFENSE_ZONES;
       console.log("Unchecked excess defense selection"); // Debug
     }
 
@@ -450,69 +455,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const battleState = sessionStorage.getItem('nfcBattleState');
     const attackZoneSelected = getSelectedAttackZone() !== null;
-    const shouldBeEnabled = attackCount === 1 && defenseCount === 2 && battleState === 'active' && attackZoneSelected;
+    const shouldBeEnabled = attackCount === REQUIRED_ATTACK_ZONES &&
+      defenseCount === REQUIRED_DEFENSE_ZONES &&
+      battleState === 'active' &&
+      attackZoneSelected;
 
     if (attackButton) {
       attackButton.disabled = !shouldBeEnabled;
       console.log(`Attack button state updated: ${shouldBeEnabled ? 'enabled' : 'disabled'}`); // Debug
-      if (!attackZoneSelected && attackCount === 1) {
+      if (!attackZoneSelected && attackCount === REQUIRED_ATTACK_ZONES) {
         console.log("Attack zone validation issue: zone selection not registering");
       }
     }
-  }
-
-  // Attack button click handler - Fix event handling
-  if (attackButton) {
-    // Remove any existing event listeners to prevent duplicates
-    attackButton.replaceWith(attackButton.cloneNode(true));
-    // Get the new reference after cloning
-    const newAttackButton = document.querySelector('.attack-button');
-
-    // Add the event listener to the new button
-    newAttackButton.addEventListener('click', function (e) {
-      console.log("Attack button clicked"); // Debug
-
-      if (sessionStorage.getItem('nfcBattleState') !== 'active') {
-        console.log("Battle not active, attack ignored"); // Debug
-        addLogEntry('Battle not active, click Start!', 'result');
-        return;
-      }
-
-      const playerAttackZone = getSelectedAttackZone();
-
-      // Add explicit check for null attack zone
-      if (playerAttackZone === null) {
-        console.log("No attack zone selected"); // Debug
-        addLogEntry('You must select an attack zone!', 'result');
-        return;
-      }
-
-      const playerDefenseZones = getSelectedDefenseZones();
-      console.log("Player selected:", playerAttackZone, playerDefenseZones); // Debug
-
-      const enemyZones = getRandomEnemyZones();
-      console.log("Enemy selected:", enemyZones); // Debug
-
-      // Process player's attack
-      processPlayerAttack(playerAttackZone, enemyZones.defense);
-
-      // If enemy is still alive, process enemy's attack
-      const enemyHP = getEnemyHP();
-      if (enemyHP > 0) {
-        // Short delay before enemy attacks
-        setTimeout(() => {
-          processEnemyAttack(enemyZones.attack, playerDefenseZones);
-
-          // Check if battle is over
-          checkBattleEnd();
-        }, fightTimeout);
-      } else {
-        // Player won
-        endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
-      }
-    });
-
-    console.log("New attack button event listener attached"); // Debug
   }
 
   // Initialize zone selection
@@ -547,11 +501,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Make sure at least one attack zone is selected
-    attackButton.disabled = checkedCount !== 1 || getSelectedDefenseZones().length !== 2 ||
+    attackButton.disabled = checkedCount !== REQUIRED_ATTACK_ZONES ||
+      getSelectedDefenseZones().length !== REQUIRED_DEFENSE_ZONES ||
       sessionStorage.getItem('nfcBattleState') !== 'active';
   }
 
-  // Validate defense selection (only two allowed)
+  // Validate defense selection (only required number allowed)
   function validateDefenseSelection() {
     const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
     let checkedCount = 0;
@@ -562,8 +517,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // If more than 2 are checked, uncheck the last one
-    if (checkedCount > 2) {
+    // If more than required are checked, uncheck the last one
+    if (checkedCount > REQUIRED_DEFENSE_ZONES) {
       // Find the last checked checkbox and uncheck it
       for (let i = defenseCheckboxes.length - 1; i >= 0; i--) {
         if (defenseCheckboxes[i].checked) {
@@ -571,11 +526,12 @@ document.addEventListener('DOMContentLoaded', function () {
           break;
         }
       }
-      checkedCount = 2;
+      checkedCount = REQUIRED_DEFENSE_ZONES;
     }
 
-    // Make sure exactly two defense zones are selected
-    attackButton.disabled = checkedCount !== 2 || getSelectedAttackZone() === null ||
+    // Make sure exactly required defense zones are selected
+    attackButton.disabled = checkedCount !== REQUIRED_DEFENSE_ZONES ||
+      getSelectedAttackZone() === null ||
       sessionStorage.getItem('nfcBattleState') !== 'active';
   }
 
@@ -625,27 +581,50 @@ document.addEventListener('DOMContentLoaded', function () {
     if (sessionStorage.getItem('nfcBattleState') !== 'active') {
       return;
     }
+    // Attack button click handler - Fix event handling
+    if (attackButton) {
+      console.log("Attack button clicked"); // Debug
 
-    const playerAttackZone = getSelectedAttackZone();
-    const playerDefenseZones = getSelectedDefenseZones();
-    const enemyZones = getRandomEnemyZones();
+      if (sessionStorage.getItem('nfcBattleState') !== 'active') {
+        console.log("Battle not active, attack ignored"); // Debug
+        addLogEntry('Battle not active, click Start!', 'result');
+        return;
+      }
 
-    // Process player's attack
-    processPlayerAttack(playerAttackZone, enemyZones.defense);
+      const playerAttackZone = getSelectedAttackZone();
 
-    // If enemy is still alive, process enemy's attack
-    const enemyHP = getEnemyHP();
-    if (enemyHP > 0) {
-      // Short delay before enemy attacks
-      setTimeout(() => {
-        processEnemyAttack(enemyZones.attack, playerDefenseZones);
+      // Add explicit check for null attack zone
+      if (playerAttackZone === null) {
+        console.log("No attack zone selected"); // Debug
+        addLogEntry('You must select an attack zone!', 'result');
+        return;
+      }
 
-        // Check if battle is over
-        checkBattleEnd();
-      }, formCloseTimeout);
-    } else {
-      // Player won
-      endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+      const playerDefenseZones = getSelectedDefenseZones();
+      console.log("Player selected:", playerAttackZone, playerDefenseZones); // Debug
+
+      const enemyZones = getRandomEnemyZones();
+      console.log("Enemy selected:", enemyZones); // Debug
+
+      // Process player's attack
+      processPlayerAttack(playerAttackZone, enemyZones.defense);
+
+      // If enemy is still alive, process enemy's attack
+      const enemyHP = getEnemyHP();
+      if (enemyHP > 0) {
+        // Short delay before enemy attacks
+        setTimeout(() => {
+          processEnemyAttack(enemyZones.attack, playerDefenseZones);
+
+          // Check if battle is over
+          checkBattleEnd();
+        }, fightTimeout);
+      } else {
+        // Player won
+        endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
+      }
+
+      console.log("New attack button event listener attached"); // Debug
     }
   });
 
@@ -658,25 +637,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add defensive check for null attack zone
     if (!attackZone) {
       console.error("Attack zone is null in processPlayerAttack");
-      addLogEntry(`${characterName.toUpperCase} failed to attack! No target selected.`, 'result');
+      addLogEntry(`${characterName} failed to attack! No target selected.`, 'result');
       return;
     }
 
     // Check if attack was defended
     if (enemyDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` + 
-        `but <span class="log_fighter">${enemyName.toUpperCase()}</span> was able to protect his <span class="log_fighter">${attackZone}</span>.`, 'player-attack');
+      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} but ${enemyName} was able to protect his ${attackZone}.`, 'player-attack');
     } else {
       // Attack successful
       const enemyHP = getEnemyHP();
       const newEnemyHP = Math.max(0, enemyHP - damage);
       setEnemyHP(newEnemyHP);
 
-      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
-        `and dealt <span class="log_damage">${damage} damage</span>.`, 'player-attack');
+      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} and dealt ${damage} damage.`, 'player-attack');
 
       // Update HP displays
       updateHPDisplays();
@@ -692,19 +667,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if attack was defended
     if (playerDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` + 
-        `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
-        `but <span class="log_fighter">${characterName.toLocaleUpperCase()}</span> was able to protect ` +
-        `his <span class="log_fighter">${attackZone}</span>.`, 'enemy-attack');
+      addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} but ${characterName} was able to protect his ${attackZone}.`, 'enemy-attack');
     } else {
       // Attack successful
       const characterHP = getCharacterHP();
       const newCharacterHP = Math.max(0, characterHP - damage);
       setCharacterHP(newCharacterHP);
 
-      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
-        `and dealt <span class="log_damage">${damage} damage</span>.`, 'enemy-attack');
+      addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} and dealt ${damage} damage.`, 'enemy-attack');
 
       // Update HP displays
       updateHPDisplays();
@@ -833,7 +803,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function addLogEntry(message, className = '') {
     const logEntry = document.createElement('div');
     logEntry.className = `log-entry ${className}`;
-    logEntry.innerHTML = message;
+    logEntry.textContent = message;
 
     logContainer.appendChild(logEntry);
 
