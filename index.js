@@ -9,6 +9,19 @@ document.addEventListener('DOMContentLoaded', function () {
   const REQUIRED_ATTACK_ZONES = 1;
   const REQUIRED_DEFENSE_ZONES = 2;
 
+  // Critical hit settings
+  const DEFAULT_CHARACTER_CH = 3;
+  const ENEMY_CRITICAL_HITS = {
+    'Spacemarine': 1,
+    'Snowtroll': 3,
+    'Spider': 1
+  };
+  const NORMAL_DAMAGE = 10;
+  const CRITICAL_DAMAGE = 15;
+  const BLOCKED_CRITICAL_DAMAGE = 5;
+  const CRITICAL_HIT_CHANCE = 0.3; // 30% chance for a critical hit
+
+  // Burger menu
   const burgerMenu = document.querySelector('.navigation__burger');
   const menu = document.querySelector('.navigation__menu');
   const overlay = document.querySelector('.page__overlay');
@@ -142,9 +155,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function setSelectedEnemy(name, hp) {
     localStorage.setItem('nfcSelectedEnemyName', name);
     localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
+    const selectedEnemyName = getSelectedEnemyName();
+    setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
 
     // Update enemy in battle interface if it's visible
     updateEnemyInBattleInterface(name, hp);
+    updateCriticalHitDisplay();
   }
 
   // Function to update enemy in battle interface when it's changed
@@ -202,6 +218,30 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 
+  // Helper functions for critical hits
+  function getCharacterCH() {
+    // return parseInt(localStorage.getItem('nfcCharacterCH')) || DEFAULT_CHARACTER_CH;
+    return parseInt(localStorage.getItem('nfcCharacterCH'));
+  }
+
+  function getEnemyCH() {
+    // return parseInt(localStorage.getItem('nfcEnemyCH')) || 
+    //        ENEMY_CRITICAL_HITS[getSelectedEnemyName()] || 1;
+    return parseInt(localStorage.getItem('nfcEnemyCH'));
+  }
+
+  function setCharacterCH(count) {
+    localStorage.setItem('nfcCharacterCH', count.toString());
+  }
+
+  function setEnemyCH(count) {
+    localStorage.setItem('nfcEnemyCH', count.toString());
+  }
+
+  function getMaxEnemyCH(enemyName) {
+    return ENEMY_CRITICAL_HITS[enemyName] || 1;
+  }
+
   // Init Local Storage
   function initLocalStorage() {
     if (!localStorage.getItem('nfcCharacterNames')) {
@@ -251,6 +291,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize character score storage
     if (!localStorage.getItem('nfcCharacterScore')) {
       localStorage.setItem('nfcCharacterScore', JSON.stringify({}));
+    }
+
+    // Initialize critical hit storage
+    if (!localStorage.getItem('nfcCharacterCH')) {
+      localStorage.setItem('nfcCharacterCH', DEFAULT_CHARACTER_CH.toString());
+    }
+
+    if (!localStorage.getItem('nfcEnemyCH')) {
+      const selectedEnemy = getSelectedEnemyName();
+      const enemyCH = ENEMY_CRITICAL_HITS[selectedEnemy] || 1;
+      localStorage.setItem('nfcEnemyCH', enemyCH.toString());
     }
   }
 
@@ -341,22 +392,28 @@ document.addEventListener('DOMContentLoaded', function () {
     enemyName.textContent = selectedEnemyName;
     enemyImage.src = `./assets/img/enemy/${selectedEnemyName.toLowerCase().replace(' ', '_')}.png`;
 
-    // Reset HP
+    // Reset HP and critical hits if not continuing a battle
     const characterMaxHP = 150;
     const enemyMaxHP = parseInt(getSelectedEnemyHP());
     const characterCurrentHP = getCharacterHP();
     const enemyCurrentHP = getEnemyHP();
 
-    // setCharacterHP(characterMaxHP);
-    // setEnemyHP(enemyMaxHP);
     if (characterCurrentHP < characterMaxHP || enemyCurrentHP < enemyMaxHP) {
-      addLogEntry('We  continue the battle! Click Start!', 'result');
+      addLogEntry('We continue the battle! Click Start!', 'result');
       sessionStorage.setItem('nfcBattleState', 'active');
       updateAttackButtonState();
     } else {
+      // Reset critical hits for a new battle
+      const selectedEnemyName = getSelectedEnemyName();
+      setCharacterCH(DEFAULT_CHARACTER_CH);
+      setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
+
       // Clear battle log
       logContainer.innerHTML = '';
     }
+
+    // Display critical hit counts
+    updateCriticalHitDisplay();
 
     // Update HP displays
     updateHPDisplays(characterMaxHP, enemyMaxHP);
@@ -412,6 +469,39 @@ document.addEventListener('DOMContentLoaded', function () {
     // End the battle
     endBattle('Player forfeited the match.');
   });
+
+  // Function to update critical hit display
+  function updateCriticalHitDisplay() {
+    const characterCH = getCharacterCH();
+    const enemyCH = getEnemyCH();
+
+    // Add critical hit info to the battle interface
+    const characterInfoPanel = document.querySelector('.battle-character');
+    const enemyInfoPanel = document.querySelector('.battle-enemy');
+
+    // Remove existing critical hit displays if any
+    const existingCharacterCH = characterInfoPanel.querySelector('.critical-hit-count');
+    const existingEnemyCH = enemyInfoPanel.querySelector('.critical-hit-count');
+
+    if (existingCharacterCH) existingCharacterCH.remove();
+    if (existingEnemyCH) existingEnemyCH.remove();
+
+    // Create new critical hit displays
+    const characterCHDisplay = document.createElement('div');
+    characterCHDisplay.className = 'critical-hit-count';
+    characterCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${characterCH}</span>`;
+
+    const enemyCHDisplay = document.createElement('div');
+    enemyCHDisplay.className = 'critical-hit-count';
+    enemyCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${enemyCH}</span>`;
+
+    // Insert after HP text
+    const characterHPText = characterInfoPanel.querySelector('.hp-text');
+    const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
+
+    characterHPText.after(characterCHDisplay);
+    enemyHPText.after(enemyCHDisplay);
+  }
 
   // Initialize zone selection - Fix event binding issues
   function initializeZoneSelection() {
@@ -674,11 +764,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Process player's attack
+  // Process player's attack - Update for critical hits
   function processPlayerAttack(attackZone, enemyDefenseZones) {
     const characterName = sessionStorage.getItem('nfcCurrentCharacter');
     const enemyName = getSelectedEnemyName();
-    const damage = 10; // 10 damage per hit
+    let damage = NORMAL_DAMAGE; // Default normal damage
+    let isCritical = false;
+
+    // Check for critical hit
+    const characterCH = getCharacterCH();
+    if (characterCH > 0 && Math.random() < CRITICAL_HIT_CHANCE) {
+      isCritical = true;
+      setCharacterCH(characterCH - 1); // Reduce critical hit counter
+      updateCriticalHitDisplay();
+    }
 
     // Add defensive check for null attack zone
     if (!attackZone) {
@@ -690,16 +789,36 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if attack was defended
     if (enemyDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
-        `but <span class="log_fighter">${enemyName.toUpperCase()}</span> was able to protect his <span class="log_fighter">${attackZone}</span>.`, 'player-attack');
+      if (isCritical) {
+        // Critical hit on a defended zone - deals half damage
+        damage = BLOCKED_CRITICAL_DAMAGE;
+        const enemyHP = getEnemyHP();
+        const newEnemyHP = Math.max(0, enemyHP - damage);
+        setEnemyHP(newEnemyHP);
+
+        addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> delivered a <span class="critical-hit">CRITICAL HIT</span> to ` +
+          `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+          `but it was partially blocked, dealing <span class="log_damage">${damage} damage</span>.`, 'player-attack');
+      } else {
+        // Normal hit on defended zone - no damage
+        addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
+          `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+          `but <span class="log_fighter">${enemyName.toUpperCase()}</span> was able to protect his <span class="log_fighter">${attackZone}</span>.`, 'player-attack');
+      }
     } else {
       // Attack successful
+      if (isCritical) {
+        // Critical hit - 1.5x damage
+        damage = CRITICAL_DAMAGE;
+      }
+
       const enemyHP = getEnemyHP();
       const newEnemyHP = Math.max(0, enemyHP - damage);
       setEnemyHP(newEnemyHP);
 
-      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
+      const hitType = isCritical ? '<span class="critical-hit">CRITICAL HIT</span>' : 'hit';
+
+      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> delivered a ${hitType} to ` +
         `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
         `and dealt <span class="log_damage">${damage} damage</span>.`, 'player-attack');
 
@@ -708,26 +827,55 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Process enemy's attack
+  // Process enemy's attack - Update for critical hits
   function processEnemyAttack(attackZone, playerDefenseZones) {
     const characterName = sessionStorage.getItem('nfcCurrentCharacter');
     const enemyName = getSelectedEnemyName();
-    const damage = 10; // 10 damage per hit
+    let damage = NORMAL_DAMAGE; // Default normal damage
+    let isCritical = false;
+
+    // Check for critical hit
+    const enemyCH = getEnemyCH();
+    if (enemyCH > 0 && Math.random() < CRITICAL_HIT_CHANCE) {
+      isCritical = true;
+      setEnemyCH(enemyCH - 1); // Reduce critical hit counter
+      updateCriticalHitDisplay();
+    }
 
     // Check if attack was defended
     if (playerDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
-        `but <span class="log_fighter">${characterName.toLocaleUpperCase()}</span> was able to protect ` +
-        `his <span class="log_fighter">${attackZone}</span>.`, 'enemy-attack');
+      if (isCritical) {
+        // Critical hit on a defended zone - deals half damage
+        damage = BLOCKED_CRITICAL_DAMAGE;
+        const characterHP = getCharacterHP();
+        const newCharacterHP = Math.max(0, characterHP - damage);
+        setCharacterHP(newCharacterHP);
+
+        addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> delivered a <span class="critical-hit">CRITICAL HIT</span> to ` +
+          `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+          `but it was partially blocked, dealing <span class="log_damage">${damage} damage</span>.`, 'enemy-attack');
+      } else {
+        // Normal hit on defended zone - no damage
+        addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
+          `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+          `but <span class="log_fighter">${characterName.toLocaleUpperCase()}</span> was able to protect ` +
+          `his <span class="log_fighter">${attackZone}</span>.`, 'enemy-attack');
+      }
     } else {
       // Attack successful
+      if (isCritical) {
+        // Critical hit - 1.5x damage
+        damage = CRITICAL_DAMAGE;
+      }
+
       const characterHP = getCharacterHP();
       const newCharacterHP = Math.max(0, characterHP - damage);
       setCharacterHP(newCharacterHP);
 
-      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
+      const hitType = isCritical ? '<span class="critical-hit">CRITICAL HIT</span>' : 'hit';
+
+      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> delivered a ${hitType} to ` +
         `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
         `and dealt <span class="log_damage">${damage} damage</span>.`, 'enemy-attack');
 
@@ -750,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // End battle
+  // End battle - Update to reset critical hits
   function endBattle(resultMessage) {
     // Update battle state
     sessionStorage.setItem('nfcBattleState', 'ended');
@@ -798,6 +946,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Reset HP values for next battle
     setCharacterHP(characterMaxHP);
     setEnemyHP(enemyMaxHP);
+
+    // Reset critical hits for next battle
+    setCharacterCH(DEFAULT_CHARACTER_CH);
+    const selectedEnemyName = getSelectedEnemyName();
+    setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
+    // updateCriticalHitDisplay();
 
     // Update UI - hide battle interface and show Fight button
     // showForm(scoreForm);
@@ -991,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Store current user
     sessionStorage.setItem('nfcCurrentCharacter', name);
     activeItemDisplay.textContent = 'Login';
-    
+
     initializeBattle();
   });
 
@@ -1132,6 +1286,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const avatars = getCharacterAvatars();
       const characterAvatar = avatars[currentCharacter] || 'default.png';
       document.getElementById('character-avatar').src = `./assets/img/avatars/${characterAvatar}`;
+
+      // Set critical hit value
+      document.querySelector('.edit-character-ch').value = getCharacterCH();
     }
   }
 
@@ -1346,6 +1503,11 @@ document.addEventListener('DOMContentLoaded', function () {
         enemyHP.className = 'enemy-hp';
         enemyHP.textContent = `Hit Points: ${hp}`;
 
+        // Add critical hit info
+        const enemyCH = document.createElement('div');
+        enemyCH.className = 'enemy-ch';
+        enemyCH.textContent = `Critical Hits: ${ENEMY_CRITICAL_HITS[name] || 1}`;
+
         // Add event listener for selecting an enemy
         enemyCard.addEventListener('click', function () {
           document.querySelectorAll('.enemy-card').forEach(card => {
@@ -1370,6 +1532,7 @@ document.addEventListener('DOMContentLoaded', function () {
         enemyCard.appendChild(enemyName);
         enemyCard.appendChild(imageContainer);
         enemyCard.appendChild(enemyHP);
+        enemyCard.appendChild(enemyCH);
 
         enemiesGrid.appendChild(enemyCard);
       });

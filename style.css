@@ -458,6 +458,32 @@
   color: var(--enemy-text-color);
 }
 
+/* Critical Hit Styles */
+.critical-hit-count {
+  display: none;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--button-color);
+}
+
+.ch-value {
+  font-weight: bold;
+}
+
+.critical-hit {
+  color: var(--button-color);
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.enemy-ch {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--button-color);
+}
+
 /* Fight End */
 
 /* Forms Start */
