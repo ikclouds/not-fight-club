@@ -206,40 +206,45 @@
     <div class="form">
       <button class="form__close">&times;</button>
       <h1 class="form__title">Edit Character</h1>
-      <div class="form__group">
-        <label for="character-name" class="form__label">Character Name
-          <input type="text" class="form__input edit-character-name">
-        </label>
-      </div>
-      <div class="form__group">
-        <label for="character-password" class="form__label">Password
-          <input type="password" class="form__input edit-character-password">
-        </label>
-      </div>
-      <div class="form__group">
-        <label for="character-repeat-password" class="form__label">Repeat Password
-          <input type="password" class="form__input edit-character-repeat-password">
-        </label>
-      </div>
-      <div class="form__group">
-        <label for="character-ch" class="form__label">Critical Hits
-          <input type="number" min="0" max="10" class="form__input edit-character-ch">
-        </label>
-      </div>
-      <div class="form__group">
-        <label for="character-dh" class="form__label">Double Hits
-          <input type="number" min="-1" max="10" class="form__input edit-character-dh">
-        </label>
-      </div>
-      <div class="form__group">
-        <label class="form__label">Avatar</label>
-        <div class="avatar-container">
-          <img src="./assets/img/avatars/default.png" alt="Character Avatar" id="character-avatar" class="avatar-image">
-          <button class="avatar-edit-button">
-            <img src="./assets/svg/edit.svg" alt="Edit" class="edit-icon">
-          </button>
+        <div class="character__fields">
+          <div class="character__text">
+            <div class="form__group">
+              <label for="character-name" class="form__label">Character Name
+                <input type="text" class="form__input edit-character-name">
+              </label>
+            </div>
+            <div class="form__group">
+              <label for="character-password" class="form__label">Password
+                <input type="password" class="form__input edit-character-password">
+              </label>
+            </div>
+            <div class="form__group">
+              <label for="character-repeat-password" class="form__label">Repeat Password
+                <input type="password" class="form__input edit-character-repeat-password">
+              </label>
+            </div>
+            <div class="form__group">
+              <label for="character-ch" class="form__label">Critical Hits
+                <input type="number" min="0" max="10" class="form__input edit-character-ch">
+              </label>
+            </div>
+            <div class="form__group">
+              <label for="character-dh" class="form__label">Double Hits
+                <input type="number" min="-1" max="10" class="form__input edit-character-dh">
+              </label>
+            </div>
+          </div>
+          <div class="form__imagegroup">
+            <label class="form__label">Avatar
+              <div class="avatar-container">
+                <img src="./assets/img/avatars/default.png" alt="Character Avatar" id="character-avatar" class="avatar-image">
+                <button class="avatar-edit-button">
+                  <img src="./assets/svg/edit.svg" alt="Edit" class="edit-icon">
+                </button>
+              </div>
+            </label>
+          </div>
         </div>
-      </div>
       <div class="form__actions">
         <button class="form__button character-save-button">Save</button>
       </div>

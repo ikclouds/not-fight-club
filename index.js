@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function getEnemies() {
     const enemies = JSON.parse(localStorage.getItem('nfcEnemies')) || {};
-    console.log('Loaded enemies:', enemies); // Debug line
+    console.log('Loaded enemies:', enemies); 
     return enemies;
   }
 
@@ -157,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getSelectedEnemyHP() {
-    // return localStorage.getItem('nfcSelectedEnemyHP') || '30';
     return localStorage.getItem('nfcSelectedEnemyHP');
   }
 
@@ -212,12 +211,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function getCharacterHP() {
-    // return parseInt(localStorage.getItem('nfcCharacterHP')) || 150;
     return parseInt(localStorage.getItem('nfcCharacterHP'));
   }
 
   function getEnemyHP() {
-    // return parseInt(localStorage.getItem('nfcEnemyHP')) || 30;
     return parseInt(localStorage.getItem('nfcEnemyHP'));
   }
 
@@ -232,13 +229,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Helper functions for critical hits
   function getCharacterCH() {
-    // return parseInt(localStorage.getItem('nfcCharacterCH')) || DEFAULT_CHARACTER_CH;
     return parseInt(localStorage.getItem('nfcCharacterCH'));
   }
 
   function getEnemyCH() {
-    // return parseInt(localStorage.getItem('nfcEnemyCH')) || 
-    //        ENEMY_CRITICAL_HITS[getSelectedEnemyName()] || 1;
     return parseInt(localStorage.getItem('nfcEnemyCH'));
   }
 
