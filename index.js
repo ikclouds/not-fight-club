@@ -637,21 +637,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add defensive check for null attack zone
     if (!attackZone) {
       console.error("Attack zone is null in processPlayerAttack");
-      addLogEntry(`${characterName} failed to attack! No target selected.`, 'result');
+      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase}</span> failed to attack! No target selected.`, 'result');
       return;
     }
 
     // Check if attack was defended
     if (enemyDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} but ${enemyName} was able to protect his ${attackZone}.`, 'player-attack');
+      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
+        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` + 
+        `but <span class="log_fighter">${enemyName.toUpperCase()}</span> was able to protect his <span class="log_fighter">${attackZone}</span>.`, 'player-attack');
     } else {
       // Attack successful
       const enemyHP = getEnemyHP();
       const newEnemyHP = Math.max(0, enemyHP - damage);
       setEnemyHP(newEnemyHP);
 
-      addLogEntry(`${characterName} attacked ${enemyName}'s ${attackZone} and dealt ${damage} damage.`, 'player-attack');
+      addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
+        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+        `and dealt <span class="log_damage">${damage} damage</span>.`, 'player-attack');
 
       // Update HP displays
       updateHPDisplays();
@@ -667,14 +671,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if attack was defended
     if (playerDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} but ${characterName} was able to protect his ${attackZone}.`, 'enemy-attack');
+      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` + 
+        `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+        `but <span class="log_fighter">${characterName.toLocaleUpperCase()}</span> was able to protect ` +
+        `his <span class="log_fighter">${attackZone}</span>.`, 'enemy-attack');
     } else {
       // Attack successful
       const characterHP = getCharacterHP();
       const newCharacterHP = Math.max(0, characterHP - damage);
       setCharacterHP(newCharacterHP);
 
-      addLogEntry(`${enemyName} attacked ${characterName}'s ${attackZone} and dealt ${damage} damage.`, 'enemy-attack');
+      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
+        `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
+        `and dealt <span class="log_damage">${damage} damage</span>.`, 'enemy-attack');
 
       // Update HP displays
       updateHPDisplays();
@@ -803,7 +812,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function addLogEntry(message, className = '') {
     const logEntry = document.createElement('div');
     logEntry.className = `log-entry ${className}`;
-    logEntry.textContent = message;
+    logEntry.innerHTML = message;
 
     logContainer.appendChild(logEntry);
 
