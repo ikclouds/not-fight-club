@@ -471,9 +471,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Start battle
   startButton.addEventListener('click', function () {
-    console.log("Start battle clicked"); // Debug
-
-    // Update battle state
     sessionStorage.setItem('nfcBattleState', 'active');
 
     // Update UI
@@ -590,7 +587,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Initialize zone selection - Fix event binding issues
   function initializeZoneSelection() {
-    console.log("Initializing zone selection..."); // Debug
     const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
     const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
 
@@ -601,7 +597,6 @@ document.addEventListener('DOMContentLoaded', function () {
       checkbox.removeEventListener('change', validateAttackSelection);
       // Add the event listener
       checkbox.addEventListener('change', validateAttackSelection);
-      console.log("Added attack listener to", checkbox.value); // Debug
     });
 
     defenseCheckboxes.forEach(checkbox => {
@@ -610,13 +605,11 @@ document.addEventListener('DOMContentLoaded', function () {
       checkbox.removeEventListener('change', validateDefenseSelection);
       // Add the event listener
       checkbox.addEventListener('change', validateDefenseSelection);
-      console.log("Added defense listener to", checkbox.value); // Debug
     });
 
     // Ensure attack button is initially disabled but clickable
     if (attackButton) {
       attackButton.disabled = true;
-      console.log("Attack button initialized and disabled"); // Debug
     } else {
       console.error("Attack button not found in the DOM");
     }
@@ -624,7 +617,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Validate attack selection (only one allowed) - Fix validation logic
   function validateAttackSelection(e) {
-    console.log("Attack selection changed:", e.target.value, e.target.checked); // Debug
     const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
     let checkedCount = 0;
 
@@ -643,7 +635,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Validate defense selection (only two allowed) - Fix validation logic
   function validateDefenseSelection(e) {
-    console.log("Defense selection changed:", e.target.value, e.target.checked); // Debug
     const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
     let checkedCount = 0;
 
@@ -657,7 +648,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (checkedCount > REQUIRED_DEFENSE_ZONES) {
       e.target.checked = false; // Uncheck the one that was just clicked
       checkedCount = REQUIRED_DEFENSE_ZONES;
-      console.log("Unchecked excess defense selection"); // Debug
     }
 
     // Update attack button state
@@ -683,7 +673,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (attackButton) {
       attackButton.disabled = !shouldBeEnabled;
-      console.log(`Attack button state updated: ${shouldBeEnabled ? 'enabled' : 'disabled'}`); // Debug
       if (!attackZoneSelected && attackCount === REQUIRED_ATTACK_ZONES) {
         console.log("Attack zone validation issue: zone selection not registering");
       }
@@ -805,10 +794,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Attack button click handler - Fix event handling
     if (attackButton) {
-      console.log("Attack button clicked"); // Debug
 
       if (sessionStorage.getItem('nfcBattleState') !== 'active') {
-        console.log("Battle not active, attack ignored"); // Debug
         addLogEntry('Battle not active, click Start!', 'result');
         return;
       }
@@ -827,8 +814,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Player won
         endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
       }
-
-      console.log("New attack button event listener attached"); // Debug
     }
   });
 
@@ -837,7 +822,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isPlayerAttacking) {
       const playerAttackZone = getSelectedAttackZone();
       if (playerAttackZone === null) {
-        console.log("No attack zone selected"); // Debug
         addLogEntry('You must select an attack zone!', 'result');
         return;
       }
@@ -1551,7 +1535,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dhField) {
       const dhValue = parseInt(dhField.value) || DEFAULT_CHARACTER_DH;
       setCharacterDH(dhValue);
-      console.log("Double hit value saved:", dhValue); // Debug log
     }
 
     characterMessage.textContent = 'Character updated successfully';
