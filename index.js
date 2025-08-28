@@ -344,15 +344,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Reset HP
     const characterMaxHP = 150;
     const enemyMaxHP = parseInt(getSelectedEnemyHP());
+    const characterCurrentHP = getCharacterHP();
+    const enemyCurrentHP = getEnemyHP();
 
-    setCharacterHP(characterMaxHP);
-    setEnemyHP(enemyMaxHP);
+    // setCharacterHP(characterMaxHP);
+    // setEnemyHP(enemyMaxHP);
+    if (characterCurrentHP < characterMaxHP || enemyCurrentHP < enemyMaxHP) {
+      addLogEntry('We  continue the battle! Click Start!', 'result');
+      sessionStorage.setItem('nfcBattleState', 'active');
+      updateAttackButtonState();
+    } else {
+      // Clear battle log
+      logContainer.innerHTML = '';
+    }
 
     // Update HP displays
     updateHPDisplays(characterMaxHP, enemyMaxHP);
-
-    // Clear battle log
-    logContainer.innerHTML = '';
 
     // Set battle state
     sessionStorage.setItem('nfcBattleState', 'ready');
@@ -984,6 +991,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Store current user
     sessionStorage.setItem('nfcCurrentCharacter', name);
     activeItemDisplay.textContent = 'Login';
+    
+    initializeBattle();
   });
 
   // Create character functionality
