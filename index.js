@@ -142,6 +142,45 @@ document.addEventListener('DOMContentLoaded', function () {
   function setSelectedEnemy(name, hp) {
     localStorage.setItem('nfcSelectedEnemyName', name);
     localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
+
+    // Update enemy in battle interface if it's visible
+    updateEnemyInBattleInterface(name, hp);
+  }
+
+  // Function to update enemy in battle interface when it's changed
+  function updateEnemyInBattleInterface(enemyName, enemyMaxHP) {
+    const battleInterface = document.querySelector('.battle-interface');
+    if (battleInterface && !battleInterface.classList.contains('hidden')) {
+      // Update enemy name and image
+      document.querySelector('.enemy-name').textContent = enemyName;
+      document.querySelector('.enemy-image').src = `./assets/img/enemy/${enemyName.toLowerCase().replace(' ', '_')}.png`;
+
+      // Update enemy HP display and bar
+      const currentEnemyHP = getEnemyHP();
+
+      // If the battle hasn't started yet or if we're switching to a new enemy,
+      // reset the enemy's HP to its maximum
+      if (sessionStorage.getItem('nfcBattleState') !== 'active') {
+        setEnemyHP(enemyMaxHP);
+        document.querySelector('.enemy-hp-text').textContent = `${enemyMaxHP}/${enemyMaxHP}`;
+        document.querySelector('.enemy-hp-bar').style.width = '100%';
+        document.querySelector('.enemy-hp-bar').classList.remove('low');
+      } else {
+        // If battle is active, maintain the current HP percentage relative to the new max
+        const hpPercentage = Math.min(1, currentEnemyHP / parseInt(getSelectedEnemyHP()));
+        const newHP = Math.round(hpPercentage * enemyMaxHP);
+        setEnemyHP(newHP);
+
+        // Update HP display
+        updateHPDisplays();
+      }
+
+      // Add log entry about enemy change if battle has started
+      if (sessionStorage.getItem('nfcBattleState') === 'active' ||
+        sessionStorage.getItem('nfcBattleState') === 'paused') {
+        addLogEntry(`Enemy changed to ${enemyName}!`, 'result');
+      }
+    }
   }
 
   function getCharacterHP() {
@@ -645,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (enemyDefenseZones.includes(attackZone)) {
       // Attack defended
       addLogEntry(`<span class="log_fighter">${characterName.toUpperCase()}</span> attacked ` +
-        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` + 
+        `<span class="log_fighter">${enemyName.toUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
         `but <span class="log_fighter">${enemyName.toUpperCase()}</span> was able to protect his <span class="log_fighter">${attackZone}</span>.`, 'player-attack');
     } else {
       // Attack successful
@@ -671,7 +710,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check if attack was defended
     if (playerDefenseZones.includes(attackZone)) {
       // Attack defended
-      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` + 
+      addLogEntry(`<span class="log_enemy_attack log_fighter">${enemyName.toUpperCase()}</span> attacked ` +
         `<span class="log_fighter">${characterName.toLocaleUpperCase()}</span>'s <span class="log_fighter">${attackZone}</span> ` +
         `but <span class="log_fighter">${characterName.toLocaleUpperCase()}</span> was able to protect ` +
         `his <span class="log_fighter">${attackZone}</span>.`, 'enemy-attack');
