@@ -1,44 +1,68 @@
+
+import {
+  initEvents
+} from './modules/events.js';
+
+import {
+  initLogging,
+  logContainer,
+  addLogEntry
+} from './modules/logging.js';
+
+// import {} from './modules/config.js';
+import {
+  burgerWidth,
+  FORM_CLOSE_TIMEOUT,
+  FIGHT_TIMEOUT,
+  REQUIRED_ATTACK_ZONES,
+  REQUIRED_DEFENSE_ZONES,
+  NORMAL_DAMAGE,
+  CRITICAL_DAMAGE,
+  BLOCKED_CRITICAL_DAMAGE,
+  CRITICAL_HIT_CHANCE,
+  DOUBLE_HIT_CHANCE,
+  DEFAULT_CHARACTER_CH,
+  ENEMY_CRITICAL_HITS,
+  DEFAULT_CHARACTER_DH,
+  ENEMY_DOUBLE_HITS,
+} from './modules/config.js';
+// import { initState } from './modules/state.js';
+
+import {
+  initState,
+  getCharacterNames,
+  characterExists, getCharacterPasswords, getCharacterAvatars, 
+  getCharacterScores, setSelectedAvatar, updateCharacterAvatar, 
+  getEnemies,  
+  getSelectedEnemyName, getSelectedEnemyHP, setSelectedEnemy,
+  getCharacterHP, setCharacterHP, getEnemyHP, setEnemyHP,
+  getCharacterCH, setCharacterCH, getEnemyCH, setEnemyCH,
+  getCharacterDH, setCharacterDH, getEnemyDH, setEnemyDH,
+  updateCharacterScore
+} from './modules/state.js';
+
+import {
+  activeItemDisplay,
+  updateHPDisplays,
+  updateCriticalHitDisplay,
+  updateDoubleHitDisplay
+} from './modules/ui.js';
+
 document.addEventListener('DOMContentLoaded', function () {
-  // Form defaults
-  const formCloseTimeout = 1000;
-  const fightTimeout = 200;
-  // Burger menu
-  const burgerWidth = 1440; // Width threshold for burger menu
+  initEvents();
+  initState();
+  initLogging();
 
-  // Combat settings
-  const REQUIRED_ATTACK_ZONES = 1;
-  const REQUIRED_DEFENSE_ZONES = 2;
-
-  // Critical hit settings
-  const DEFAULT_CHARACTER_CH = 3;
-  const ENEMY_CRITICAL_HITS = {
-    'Spacemarine': 1,
-    'Snowtroll': 3,
-    'Spider': 1
-  };
-  const NORMAL_DAMAGE = 10;
-  const CRITICAL_DAMAGE = 15;
-  const BLOCKED_CRITICAL_DAMAGE = 5;
-  const CRITICAL_HIT_CHANCE = 0.3; // 30% chance for a critical hit
-
-  // Double hit settings
-  const DEFAULT_CHARACTER_DH = 0;
-  const ENEMY_DOUBLE_HITS = {
-    'Spacemarine': 0,
-    'Snowtroll': 0,
-    'Spider': -1 // -1 means all hits are double
-  };
-  const DOUBLE_HIT_CHANCE = 0.2; // 20% chance for a double hit
 
   // Burger menu
   const burgerMenu = document.querySelector('.navigation__burger');
   const menu = document.querySelector('.navigation__menu');
   const overlay = document.querySelector('.page__overlay');
   const menuLinks = document.querySelectorAll('.navigation__link');
-  const activeItemDisplay = document.querySelector('.navigation__active-item');
+  // const activeItemDisplay = document.querySelector('.navigation__active-item');
 
   // Initialize the application
-  initLocalStorage();
+  // initLocalStorage();
   checkLoginState();
 
   // Toggle burger menu
@@ -111,238 +135,186 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Define helper functions
 
-  function getCharacterNames() {
-    return JSON.parse(localStorage.getItem('nfcCharacterNames')) || [];
-  }
+  // function getCharacterNames() {
+  //   return JSON.parse(localStorage.getItem('nfcCharacterNames')) || [];
+  // }
 
-  function characterExists(name) {
-    const names = getCharacterNames();
-    return names.includes(name);
-  }
+  // function characterExists(name) {
+  //   const names = getCharacterNames();
+  //   return names.includes(name);
+  // }
 
-  function getCharacterPasswords() {
-    return JSON.parse(localStorage.getItem('nfcCharacterPasswords')) || {};
-  }
+  // function getCharacterPasswords() {
+  //   return JSON.parse(localStorage.getItem('nfcCharacterPasswords')) || {};
+  // }
 
-  function getCharacterAvatars() {
-    return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
-  }
+  // function getCharacterAvatars() {
+  //   return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
+  // }
 
-  function getCharacterScores() {
-    return JSON.parse(localStorage.getItem('nfcCharacterScore')) || {};
-  }
+  // function getCharacterScores() {
+  //   return JSON.parse(localStorage.getItem('nfcCharacterScore')) || {};
+  // }
 
-  function getCharacterAvatars() {
-    return JSON.parse(localStorage.getItem('nfcCharacterAvatars')) || {};
-  }
+  // function setSelectedAvatar(avatar) {
+  //   localStorage.setItem('nfcClubSelectedAvatar', avatar);
+  // }
 
-  function setSelectedAvatar(avatar) {
-    localStorage.setItem('nfcClubSelectedAvatar', avatar);
-  }
+  // function updateCharacterAvatar(name, avatar) {
+  //   const avatars = getCharacterAvatars();
+  //   avatars[name] = avatar;
+  //   localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
+  // }
 
-  function updateCharacterAvatar(name, avatar) {
-    const avatars = getCharacterAvatars();
-    avatars[name] = avatar;
-    localStorage.setItem('nfcCharacterAvatars', JSON.stringify(avatars));
-  }
+  // function getEnemies() {
+  //   const enemies = JSON.parse(localStorage.getItem('nfcEnemies')) || {};
+  //   return enemies;
+  // }
 
-  function getEnemies() {
-    const enemies = JSON.parse(localStorage.getItem('nfcEnemies')) || {};
-    console.log('Loaded enemies:', enemies); 
-    return enemies;
-  }
+  // function getSelectedEnemyName() {
+  //   return localStorage.getItem('nfcSelectedEnemyName') || 'Spacemarine';
+  // }
 
-  function getSelectedEnemyName() {
-    return localStorage.getItem('nfcSelectedEnemyName') || 'Spacemarine';
-  }
+  // function getSelectedEnemyHP() {
+  //   return localStorage.getItem('nfcSelectedEnemyHP');
+  // }
 
-  function getSelectedEnemyHP() {
-    return localStorage.getItem('nfcSelectedEnemyHP');
-  }
+  // function setSelectedEnemy(name, hp) {
+  //   localStorage.setItem('nfcSelectedEnemyName', name);
+  //   localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
 
-  function setSelectedEnemy(name, hp) {
-    localStorage.setItem('nfcSelectedEnemyName', name);
-    localStorage.setItem('nfcSelectedEnemyHP', hp.toString());
+  //   // Reset critical hits and double hits for the new enemy
+  //   setEnemyCH(ENEMY_CRITICAL_HITS[name] || 1);
+  //   setEnemyDH(ENEMY_DOUBLE_HITS[name] || 0);
 
-    // Reset critical hits and double hits for the new enemy
-    setEnemyCH(ENEMY_CRITICAL_HITS[name] || 1);
-    setEnemyDH(ENEMY_DOUBLE_HITS[name] || 0);
+  //   // Update enemy in battle interface
+  //   updateEnemyInBattle(name, hp);
+  //   updateCriticalHitDisplay();
+  //   updateDoubleHitDisplay();
+  // }
 
-    // Update enemy in battle interface if it's visible
-    updateEnemyInBattleInterface(name, hp);
-    updateCriticalHitDisplay();
-    updateDoubleHitDisplay();
-  }
+  // function getCharacterHP() {
+  //   return parseInt(localStorage.getItem('nfcCharacterHP'));
+  // }
 
-  // Function to update enemy in battle interface when it's changed
-  function updateEnemyInBattleInterface(enemyName, enemyMaxHP) {
-    const battleInterface = document.querySelector('.battle-interface');
-    if (battleInterface && !battleInterface.classList.contains('hidden')) {
-      // Update enemy name and image
-      document.querySelector('.enemy-name').textContent = enemyName;
-      document.querySelector('.enemy-image').src = `./assets/img/enemy/${enemyName.toLowerCase().replace(' ', '_')}.png`;
+  //   return parseInt(localStorage.getItem('nfcEnemyHP'));
+  // }
 
-      // Update enemy HP display and bar
-      const currentEnemyHP = getEnemyHP();
+  // function setCharacterHP(hp) {
+  //   localStorage.setItem('nfcCharacterHP', hp.toString());
+  // }
 
-      // If the battle hasn't started yet or if we're switching to a new enemy,
-      // reset the enemy's HP to its maximum
-      if (sessionStorage.getItem('nfcBattleState') !== 'active') {
-        setEnemyHP(enemyMaxHP);
-        document.querySelector('.enemy-hp-text').textContent = `${enemyMaxHP}/${enemyMaxHP}`;
-        document.querySelector('.enemy-hp-bar').style.width = '100%';
-        document.querySelector('.enemy-hp-bar').classList.remove('low');
-      } else {
-        // If battle is active, maintain the current HP percentage relative to the new max
-        const hpPercentage = Math.min(1, currentEnemyHP / parseInt(getSelectedEnemyHP()));
-        const newHP = Math.round(hpPercentage * enemyMaxHP);
-        setEnemyHP(newHP);
-
-        // Update HP display
-        updateHPDisplays();
-      }
-
-      // Add log entry about enemy change if battle has started
-      if (sessionStorage.getItem('nfcBattleState') === 'active' ||
-        sessionStorage.getItem('nfcBattleState') === 'paused') {
-        addLogEntry(`Enemy changed to ${enemyName}!`, 'result');
-      }
-    }
-  }
-
-  function getCharacterHP() {
-    return parseInt(localStorage.getItem('nfcCharacterHP'));
-  }
-
-  function getEnemyHP() {
-    return parseInt(localStorage.getItem('nfcEnemyHP'));
-  }
-
-  function setCharacterHP(hp) {
-    localStorage.setItem('nfcCharacterHP', hp.toString());
-  }
-
-  function setEnemyHP(hp) {
-    localStorage.setItem('nfcEnemyHP', hp.toString());
-  }
-
+  // function setEnemyHP(hp) {
+  //   localStorage.setItem('nfcEnemyHP', hp.toString());
+  // }
 
   // Helper functions for critical hits
-  function getCharacterCH() {
-    return parseInt(localStorage.getItem('nfcCharacterCH'));
-  }
+  // function getCharacterCH() {
+  //   return parseInt(localStorage.getItem('nfcCharacterCH'));
+  // }
 
-  function getEnemyCH() {
-    return parseInt(localStorage.getItem('nfcEnemyCH'));
-  }
+  // function getEnemyCH() {
+  //   return parseInt(localStorage.getItem('nfcEnemyCH'));
+  // }
 
-  function setCharacterCH(count) {
-    localStorage.setItem('nfcCharacterCH', count.toString());
-  }
+  // function setCharacterCH(count) {
+  //   localStorage.setItem('nfcCharacterCH', count.toString());
+  // }
 
-  function setEnemyCH(count) {
-    localStorage.setItem('nfcEnemyCH', count.toString());
-  }
-
-  function getMaxEnemyCH(enemyName) {
-    return ENEMY_CRITICAL_HITS[enemyName] || 1;
-  }
+  // function setEnemyCH(count) {
+  //   localStorage.setItem('nfcEnemyCH', count.toString());
+  // }
 
   // Helper functions for double hits
-  function getCharacterDH() {
-    return parseInt(localStorage.getItem('nfcCharacterDH'));
-  }
+  // function getCharacterDH() {
+  //   return parseInt(localStorage.getItem('nfcCharacterDH'));
+  // }
 
-  function getEnemyDH() {
-    return parseInt(localStorage.getItem('nfcEnemyDH'));
-  }
+  // function getEnemyDH() {
+  //   return parseInt(localStorage.getItem('nfcEnemyDH'));
+  // }
 
-  function setCharacterDH(count) {
-    localStorage.setItem('nfcCharacterDH', count.toString());
-  }
+  // function setCharacterDH(count) {
+  //   localStorage.setItem('nfcCharacterDH', count.toString());
+  // }
 
-  function setEnemyDH(count) {
-    localStorage.setItem('nfcEnemyDH', count.toString());
-  }
+  // function setEnemyDH(count) {
+  //   localStorage.setItem('nfcEnemyDH', count.toString());
+  // }
 
-  function getMaxEnemyDH(enemyName) {
-    return ENEMY_DOUBLE_HITS[enemyName] || 0;
-  }
 
   // Init Local Storage
   function initLocalStorage() {
-    if (!localStorage.getItem('nfcCharacterNames')) {
-      localStorage.setItem('nfcCharacterNames', JSON.stringify([]));
-    }
+    // if (!localStorage.getItem('nfcCharacterNames')) {
+    //   localStorage.setItem('nfcCharacterNames', JSON.stringify([]));
+    // }
 
-    if (!localStorage.getItem('nfcCharacterPasswords')) {
-      localStorage.setItem('nfcCharacterPasswords', JSON.stringify({}));
-    }
+    // if (!localStorage.getItem('nfcCharacterPasswords')) {
+    //   localStorage.setItem('nfcCharacterPasswords', JSON.stringify({}));
+    // }
 
-    // Initialize new storage items
-    if (!localStorage.getItem('nfcCharacterAvatars')) {
-      localStorage.setItem('nfcCharacterAvatars', JSON.stringify({}));
-    }
+    // if (!localStorage.getItem('nfcCharacterAvatars')) {
+    //   localStorage.setItem('nfcCharacterAvatars', JSON.stringify({}));
+    // }
 
-    if (!localStorage.getItem('nfcSelectedAvatar')) {
-      localStorage.setItem('nfcSelectedAvatar', 'default.png');
-    }
+    // if (!localStorage.getItem('nfcSelectedAvatar')) {
+    //   localStorage.setItem('nfcSelectedAvatar', 'default.png');
+    // }
 
     // Initialize enemy storage items
-    if (!localStorage.getItem('nfcEnemies')) {
-      const enemies = {
-        'Spacemarine': 170,
-        'Snowtroll': 150,
-        'Spider': 90
-      };
-      localStorage.setItem('nfcEnemies', JSON.stringify(enemies));
-    }
+    // if (!localStorage.getItem('nfcEnemies')) {
+    //   const enemies = {
+    //     'Spacemarine': 170,
+    //     'Snowtroll': 150,
+    //     'Spider': 90
+    //   };
+    //   localStorage.setItem('nfcEnemies', JSON.stringify(enemies));
+    // }
 
-    if (!localStorage.getItem('nfcSelectedEnemyName')) {
-      localStorage.setItem('nfcSelectedEnemyName', 'Spacemarine');
-    }
-
-    if (!localStorage.getItem('nfcSelectedEnemyHP')) {
-      localStorage.setItem('nfcSelectedEnemyHP', '170');
-    }
+    // if (!localStorage.getItem('nfcSelectedEnemyName')) {
+    //   localStorage.setItem('nfcSelectedEnemyName', 'Spacemarine');
+    // }
 
     // Initialize HP level storage items
-    if (!localStorage.getItem('nfcCharacterHP')) {
-      localStorage.setItem('nfcCharacterHP', '150');
-    }
+    // if (!localStorage.getItem('nfcCharacterHP')) {
+    //   localStorage.setItem('nfcCharacterHP', '150');
+    // }
 
-    if (!localStorage.getItem('nfcEnemyHP')) {
-      localStorage.setItem('nfcEnemyHP', '170');
-    }
+    // if (!localStorage.getItem('nfcSelectedEnemyHP')) {
+    //   localStorage.setItem('nfcSelectedEnemyHP', '170');
+    // }
+
+    // if (!localStorage.getItem('nfcEnemyHP')) {
+    //   localStorage.setItem('nfcEnemyHP', '170');
+    // }
 
     // Initialize character score storage
-    if (!localStorage.getItem('nfcCharacterScore')) {
-      localStorage.setItem('nfcCharacterScore', JSON.stringify({}));
-    }
+    // if (!localStorage.getItem('nfcCharacterScore')) {
+    //   localStorage.setItem('nfcCharacterScore', JSON.stringify({}));
+    // }
 
     // Initialize critical hit storage
-    if (!localStorage.getItem('nfcCharacterCH')) {
-      localStorage.setItem('nfcCharacterCH', DEFAULT_CHARACTER_CH.toString());
-    }
+    // if (!localStorage.getItem('nfcCharacterCH')) {
+    //   localStorage.setItem('nfcCharacterCH', DEFAULT_CHARACTER_CH.toString());
+    // }
 
-    if (!localStorage.getItem('nfcEnemyCH')) {
-      const selectedEnemy = getSelectedEnemyName();
-      const enemyCH = ENEMY_CRITICAL_HITS[selectedEnemy] || 1;
-      localStorage.setItem('nfcEnemyCH', enemyCH.toString());
-    }
+    // if (!localStorage.getItem('nfcEnemyCH')) {
+    //   const selectedEnemy = getSelectedEnemyName();
+    //   const enemyCH = ENEMY_CRITICAL_HITS[selectedEnemy] || 1;
+    //   localStorage.setItem('nfcEnemyCH', enemyCH.toString());
+    // }
 
     // Initialize double hit storage
-    if (!localStorage.getItem('nfcCharacterDH')) {
-      localStorage.setItem('nfcCharacterDH', DEFAULT_CHARACTER_DH.toString());
-    }
+    // if (!localStorage.getItem('nfcCharacterDH')) {
+    //   localStorage.setItem('nfcCharacterDH', DEFAULT_CHARACTER_DH.toString());
+    // }
 
-    if (!localStorage.getItem('nfcEnemyDH')) {
-      const selectedEnemy = getSelectedEnemyName();
-      const enemyDH = ENEMY_DOUBLE_HITS[selectedEnemy] || 0;
-      localStorage.setItem('nfcEnemyDH', enemyDH.toString());
-    }
+    // if (!localStorage.getItem('nfcEnemyDH')) {
+    //   const selectedEnemy = getSelectedEnemyName();
+    //   const enemyDH = ENEMY_DOUBLE_HITS[selectedEnemy] || 0;
+    //   localStorage.setItem('nfcEnemyDH', enemyDH.toString());
+    // }
   }
-
 
   // Check login state on page load
   function checkLoginState() {
@@ -354,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelector('.score-link').classList.remove('hidden');
       document.querySelector('.settings-link').classList.remove('hidden');
 
-      // Set default active menu item to Fight for logged in users
+      // Set default active menu item to Fight
       if (!sessionStorage.getItem('nfcActiveMenuItem')) {
         activeItemDisplay.textContent = 'Fight';
         sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
@@ -371,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function () {
       sessionStorage.removeItem('nfcActiveMenuItem');
     }
 
-    // Restore active menu item from session if available
+    // Restore active menu item from session
     const activeMenuItem = sessionStorage.getItem('nfcActiveMenuItem');
     if (activeMenuItem) {
       activeItemDisplay.textContent = activeMenuItem;
@@ -389,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const stopButton = document.querySelector('.battle-stop');
   const finishButton = document.querySelector('.battle-finish');
   const attackButton = document.querySelector('.attack-button');
-  const logContainer = document.querySelector('.log-container');
+  // const logContainer = document.querySelector('.log-container');
 
   // Initialize battle UI
   function initializeBattle() {
@@ -410,8 +382,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
     const characterName = document.querySelector('.character-name');
     const characterImage = document.querySelector('.character-image');
-    const characterHP = document.querySelector('.character-hp-text');
-    const characterHPBar = document.querySelector('.character-hp-bar');
 
     characterName.textContent = currentCharacter;
 
@@ -423,8 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Set up enemy info
     const enemyName = document.querySelector('.enemy-name');
     const enemyImage = document.querySelector('.enemy-image');
-    const enemyHP = document.querySelector('.enemy-hp-text');
-    const enemyHPBar = document.querySelector('.enemy-hp-bar');
 
     const selectedEnemyName = getSelectedEnemyName();
     enemyName.textContent = selectedEnemyName;
@@ -508,82 +476,112 @@ document.addEventListener('DOMContentLoaded', function () {
     endBattle('Player forfeited the match.');
   });
 
-  // Function to update critical hit display
-  function updateCriticalHitDisplay() {
-    const characterCH = getCharacterCH();
-    const enemyCH = getEnemyCH();
+  // // Function to update critical hit display
+  // function updateCriticalHitDisplay() {
+  //   const characterCH = getCharacterCH();
+  //   const enemyCH = getEnemyCH();
 
-    // Add critical hit info to the battle interface
-    const characterInfoPanel = document.querySelector('.battle-character');
-    const enemyInfoPanel = document.querySelector('.battle-enemy');
+  //   // Add critical hit info to the battle interface
+  //   const characterInfoPanel = document.querySelector('.battle-character');
+  //   const enemyInfoPanel = document.querySelector('.battle-enemy');
 
-    // Remove existing critical hit displays if any
-    const existingCharacterCH = characterInfoPanel.querySelector('.critical-hit-count');
-    const existingEnemyCH = enemyInfoPanel.querySelector('.critical-hit-count');
+  //   // Remove existing critical hit displays if any
+  //   const existingCharacterCH = characterInfoPanel.querySelector('.critical-hit-count');
+  //   const existingEnemyCH = enemyInfoPanel.querySelector('.critical-hit-count');
 
-    if (existingCharacterCH) existingCharacterCH.remove();
-    if (existingEnemyCH) existingEnemyCH.remove();
+  //   if (existingCharacterCH) existingCharacterCH.remove();
+  //   if (existingEnemyCH) existingEnemyCH.remove();
 
-    // Create new critical hit displays
-    const characterCHDisplay = document.createElement('div');
-    characterCHDisplay.className = 'critical-hit-count';
-    characterCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${characterCH}</span>`;
+  //   // Create new critical hit displays
+  //   const characterCHDisplay = document.createElement('div');
+  //   characterCHDisplay.className = 'critical-hit-count';
+  //   characterCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${characterCH}</span>`;
 
-    const enemyCHDisplay = document.createElement('div');
-    enemyCHDisplay.className = 'critical-hit-count';
-    enemyCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${enemyCH}</span>`;
+  //   const enemyCHDisplay = document.createElement('div');
+  //   enemyCHDisplay.className = 'critical-hit-count';
+  //   enemyCHDisplay.innerHTML = `Critical Hits: <span class="ch-value">${enemyCH}</span>`;
 
-    // Insert after HP text
-    const characterHPText = characterInfoPanel.querySelector('.hp-text');
-    const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
+  //   // Insert after HP text
+  //   const characterHPText = characterInfoPanel.querySelector('.hp-text');
+  //   const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
 
-    characterHPText.after(characterCHDisplay);
-    enemyHPText.after(enemyCHDisplay);
-  }
+  //   characterHPText.after(characterCHDisplay);
+  //   enemyHPText.after(enemyCHDisplay);
+  // }
 
-  // Function to update double hit display
-  function updateDoubleHitDisplay() {
-    const characterDH = getCharacterDH();
-    const enemyDH = getEnemyDH();
+  // // Function to update double hit display
+  // function updateDoubleHitDisplay() {
+  //   const characterDH = getCharacterDH();
+  //   const enemyDH = getEnemyDH();
 
-    // Add double hit info to the battle interface
-    const characterInfoPanel = document.querySelector('.battle-character');
-    const enemyInfoPanel = document.querySelector('.battle-enemy');
+  //   // Add double hit info to the battle interface
+  //   const characterInfoPanel = document.querySelector('.battle-character');
+  //   const enemyInfoPanel = document.querySelector('.battle-enemy');
 
-    // Remove existing double hit displays if any
-    const existingCharacterDH = characterInfoPanel.querySelector('.double-hit-count');
-    const existingEnemyDH = enemyInfoPanel.querySelector('.double-hit-count');
+  //   // Remove existing double hit displays if any
+  //   const existingCharacterDH = characterInfoPanel.querySelector('.double-hit-count');
+  //   const existingEnemyDH = enemyInfoPanel.querySelector('.double-hit-count');
 
-    if (existingCharacterDH) existingCharacterDH.remove();
-    if (existingEnemyDH) existingEnemyDH.remove();
+  //   if (existingCharacterDH) existingCharacterDH.remove();
+  //   if (existingEnemyDH) existingEnemyDH.remove();
 
-    // Create new double hit displays
-    const characterDHDisplay = document.createElement('div');
-    characterDHDisplay.className = 'double-hit-count';
-    characterDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${characterDH === -1 ? "∞" : characterDH}</span>`;
+  //   // Create new double hit displays
+  //   const characterDHDisplay = document.createElement('div');
+  //   characterDHDisplay.className = 'double-hit-count';
+  //   characterDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${characterDH === -1 ? "∞" : characterDH}</span>`;
 
-    const enemyDHDisplay = document.createElement('div');
-    enemyDHDisplay.className = 'double-hit-count';
-    enemyDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${enemyDH === -1 ? "∞" : enemyDH}</span>`;
+  //   const enemyDHDisplay = document.createElement('div');
+  //   enemyDHDisplay.className = 'double-hit-count';
+  //   enemyDHDisplay.innerHTML = `Double Hits: <span class="dh-value">${enemyDH === -1 ? "∞" : enemyDH}</span>`;
 
-    // Insert after critical hit text
-    const characterCHText = characterInfoPanel.querySelector('.critical-hit-count');
-    const enemyCHText = enemyInfoPanel.querySelector('.critical-hit-count');
+  //   // Insert after critical hit text
+  //   const characterCHText = characterInfoPanel.querySelector('.critical-hit-count');
+  //   const enemyCHText = enemyInfoPanel.querySelector('.critical-hit-count');
 
-    if (characterCHText) {
-      characterCHText.after(characterDHDisplay);
-    } else {
-      const characterHPText = characterInfoPanel.querySelector('.hp-text');
-      characterHPText.after(characterDHDisplay);
-    }
+  //   if (characterCHText) {
+  //     characterCHText.after(characterDHDisplay);
+  //   } else {
+  //     const characterHPText = characterInfoPanel.querySelector('.hp-text');
+  //     characterHPText.after(characterDHDisplay);
+  //   }
 
-    if (enemyCHText) {
-      enemyCHText.after(enemyDHDisplay);
-    } else {
-      const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
-      enemyHPText.after(enemyDHDisplay);
-    }
-  }
+  //   if (enemyCHText) {
+  //     enemyCHText.after(enemyDHDisplay);
+  //   } else {
+  //     const enemyHPText = enemyInfoPanel.querySelector('.hp-text');
+  //     enemyHPText.after(enemyDHDisplay);
+  //   }
+  // }
+
+  // // Function to update enemy in battle interface when it's changed
+  // function updateEnemyInBattle(enemyName, enemyMaxHP) {
+  //   const battleInterface = document.querySelector('.battle-interface');
+  //   if (battleInterface && !battleInterface.classList.contains('hidden')) {
+  //     document.querySelector('.enemy-name').textContent = enemyName;
+  //     document.querySelector('.enemy-image').src = `./assets/img/enemy/${enemyName.toLowerCase().replace(' ', '_')}.png`;
+
+  //     const currentEnemyHP = getEnemyHP();
+
+  //     if (sessionStorage.getItem('nfcBattleState') !== 'active') {
+  //       setEnemyHP(enemyMaxHP);
+  //       document.querySelector('.enemy-hp-text').textContent = `${enemyMaxHP}/${enemyMaxHP}`;
+  //       document.querySelector('.enemy-hp-bar').style.width = '100%';
+  //       document.querySelector('.enemy-hp-bar').classList.remove('low');
+  //     } else {
+  //       // If battle is active
+  //       const hpPercentage = Math.min(1, currentEnemyHP / parseInt(getSelectedEnemyHP()));
+  //       const newHP = Math.round(hpPercentage * enemyMaxHP);
+  //       setEnemyHP(newHP);
+
+  //       updateHPDisplays();
+  //     }
+
+  //     if (sessionStorage.getItem('nfcBattleState') === 'active' ||
+  //       sessionStorage.getItem('nfcBattleState') === 'paused') {
+  //       addLogEntry(`Enemy changed to ${enemyName}!`, 'result');
+  //     }
+  //   }
+  // }
 
   // Initialize zone selection - Fix event binding issues
   function initializeZoneSelection() {
@@ -593,21 +591,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Clear all selections and remove any existing event listeners
     attackCheckboxes.forEach(checkbox => {
       checkbox.checked = false;
-      // Remove existing listeners to prevent duplicates
       checkbox.removeEventListener('change', validateAttackSelection);
-      // Add the event listener
       checkbox.addEventListener('change', validateAttackSelection);
     });
 
     defenseCheckboxes.forEach(checkbox => {
       checkbox.checked = false;
-      // Remove existing listeners to prevent duplicates
       checkbox.removeEventListener('change', validateDefenseSelection);
-      // Add the event listener
       checkbox.addEventListener('change', validateDefenseSelection);
     });
 
-    // Ensure attack button is initially disabled but clickable
+    // Attack button is initially disabled but clickable
     if (attackButton) {
       attackButton.disabled = true;
     } else {
@@ -615,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Validate attack selection (only one allowed) - Fix validation logic
+  // Validate attack selection (only one allowed)
   function validateAttackSelection(e) {
     const attackCheckboxes = document.querySelectorAll('input[name="attack"]');
     let checkedCount = 0;
@@ -633,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateAttackButtonState(checkedCount);
   }
 
-  // Validate defense selection (only two allowed) - Fix validation logic
+  // Validate defense selection (only two allowed)
   function validateDefenseSelection(e) {
     const defenseCheckboxes = document.querySelectorAll('input[name="defense"]');
     let checkedCount = 0;
@@ -806,11 +800,10 @@ document.addEventListener('DOMContentLoaded', function () {
       // If enemy is still alive, process enemy's attack
       const enemyHP = getEnemyHP();
       if (enemyHP > 0) {
-        // Short delay before enemy attacks
         setTimeout(() => {
-          processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
-        }, fightTimeout);
-      } else {
+          // processEnemyAttackWithDoubleHit(playerDefenseZones);
+        }, FIGHT_TIMEOUT);
+      } else {h
         // Player won
         endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
       }
@@ -856,18 +849,18 @@ document.addEventListener('DOMContentLoaded', function () {
           const updatedEnemyHP = getEnemyHP();
           if (updatedEnemyHP > 0) {
             setTimeout(() => {
-              processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
-            }, fightTimeout);
+              processEnemyAttackWithDoubleHit(playerDefenseZones);
+            }, FIGHT_TIMEOUT);
           } else {
             endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
           }
-        }, fightTimeout);
+        }, FIGHT_TIMEOUT);
       } else {
         // Check if enemy is still alive before enemy attacks
         if (enemyHP > 0) {
           setTimeout(() => {
-            processEnemyAttackWithDoubleHit(enemyZones.attack, playerDefenseZones);
-          }, fightTimeout);
+            processEnemyAttackWithDoubleHit(playerDefenseZones);
+          }, FIGHT_TIMEOUT);
         } else {
           endBattle(`${sessionStorage.getItem('nfcCurrentCharacter')} has defeated ${getSelectedEnemyName()}!`);
         }
@@ -876,9 +869,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Handle enemy attack with potential double hit
-  function processEnemyAttackWithDoubleHit(attackZone, playerDefenseZones) {
+  function processEnemyAttackWithDoubleHit(playerDefenseZones) {
     // Check if enemy gets a double hit
     let doubleHit = false;
+    const zones = ['Head', 'Neck', 'Body', 'Belly', 'Legs'];
     const enemyDH = getEnemyDH();
 
     if (enemyDH === -1 || (enemyDH > 0 && Math.random() < DOUBLE_HIT_CHANCE)) {
@@ -890,23 +884,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Process enemy's first attack
-    processEnemyAttack(attackZone, playerDefenseZones);
+    const newAttackZone = zones[Math.floor(Math.random() * zones.length)];
+    processEnemyAttack(newAttackZone, playerDefenseZones);
 
     // If double hit and character still alive, do a second attack
     const characterHP = getCharacterHP();
     if (doubleHit && characterHP > 0) {
       setTimeout(() => {
-        // Get new attack zone for second attack
-        const zones = ['Head', 'Neck', 'Body', 'Belly', 'Legs'];
+        // Get attack zone for second attack
         const newAttackZone = zones[Math.floor(Math.random() * zones.length)];
 
         processEnemyAttack(newAttackZone, playerDefenseZones);
 
-        // Check if battle is over after second attack
         checkBattleEnd();
-      }, fightTimeout);
+      }, FIGHT_TIMEOUT);
     } else {
-      // Check if battle is over
       checkBattleEnd();
     }
   }
@@ -1047,7 +1039,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // End battle - Update to reset critical hits
   function endBattle(resultMessage) {
-    // Update battle state
     sessionStorage.setItem('nfcBattleState', 'ended');
 
     // Get final HP values
@@ -1103,14 +1094,9 @@ document.addEventListener('DOMContentLoaded', function () {
     setEnemyDH(ENEMY_DOUBLE_HITS[selectedEnemyName] || 0);
 
     // Update UI - hide battle interface and show Fight button
-    // showForm(scoreForm);
-    // battleInterface.classList.add('hidden');
-    // battleControls.classList.add('hidden');
     fightButton.parentElement.classList.remove('hidden');
-    // attackButton.classList.add('hidden');
     document.querySelector('.battle-controls-panel').classList.add('hidden');
 
-    // Hide battle control buttons
     hideBattleButtons();
     addLogEntry('Battle ended! Press Fight to start a new battle.', 'result');
   }
@@ -1122,94 +1108,100 @@ document.addEventListener('DOMContentLoaded', function () {
     finishButton.classList.add('hidden');
   }
 
-  // Update HP displays
-  function updateHPDisplays() {
-    const characterHP = getCharacterHP();
-    const enemyHP = getEnemyHP();
-    const characterMaxHP = 150;
-    const enemyMaxHP = parseInt(getSelectedEnemyHP());
+  // // Update HP displays
+  // function updateHPDisplays() {
+  //   const characterHP = getCharacterHP();
+  //   const enemyHP = getEnemyHP();
+  //   const characterMaxHP = 150;
+  //   const enemyMaxHP = parseInt(getSelectedEnemyHP());
 
-    // Update text displays
-    document.querySelector('.character-hp-text').textContent = `${characterHP}/${characterMaxHP}`;
-    document.querySelector('.enemy-hp-text').textContent = `${enemyHP}/${enemyMaxHP}`;
+  //   // Update text displays
+  //   document.querySelector('.character-hp-text').textContent = `${characterHP}/${characterMaxHP}`;
+  //   document.querySelector('.enemy-hp-text').textContent = `${enemyHP}/${enemyMaxHP}`;
 
-    activeItemDisplay.textContent = 'Fight';
-    sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
+  //   activeItemDisplay.textContent = 'Fight';
+  //   sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
 
-    // Update HP bars
-    const characterHPBar = document.querySelector('.character-hp-bar');
-    const enemyHPBar = document.querySelector('.enemy-hp-bar');
+  //   // Update HP bars
+  //   const characterHPBar = document.querySelector('.character-hp-bar');
+  //   const enemyHPBar = document.querySelector('.enemy-hp-bar');
 
-    characterHPBar.style.width = `${(characterHP / characterMaxHP) * 100}%`;
-    enemyHPBar.style.width = `${(enemyHP / enemyMaxHP) * 100}%`;
+  //   characterHPBar.style.width = `${(characterHP / characterMaxHP) * 100}%`;
+  //   enemyHPBar.style.width = `${(enemyHP / enemyMaxHP) * 100}%`;
 
-    // Add 'low' class if HP is below 30%
-    if (characterHP / characterMaxHP < 0.3) {
-      characterHPBar.classList.add('low');
-    } else {
-      characterHPBar.classList.remove('low');
-    }
+  //   // Add 'low' class if HP is below 30%
+  //   if (characterHP / characterMaxHP < 0.3) {
+  //     characterHPBar.classList.add('low');
+  //   } else {
+  //     characterHPBar.classList.remove('low');
+  //   }
 
-    if (enemyHP / enemyMaxHP < 0.3) {
-      enemyHPBar.classList.add('low');
-    } else {
-      enemyHPBar.classList.remove('low');
-    }
-  }
+  //   if (enemyHP / enemyMaxHP < 0.3) {
+  //     enemyHPBar.classList.add('low');
+  //   } else {
+  //     enemyHPBar.classList.remove('low');
+  //   }
+  // }
 
-  // Add entry to battle log
-  function addLogEntry(message, className = '') {
-    const logEntry = document.createElement('div');
-    logEntry.className = `log-entry ${className}`;
-    logEntry.innerHTML = message;
+  // // Add entry to battle log
+  // function addLogEntry(message, className = '') {
+  //   const logEntry = document.createElement('div');
+  //   logEntry.className = `log-entry ${className}`;
+  //   logEntry.innerHTML = message;
 
-    logContainer.appendChild(logEntry);
+  //   logContainer.appendChild(logEntry);
+  //   logContainer.scrollTop = logContainer.scrollHeight;
+  // }
 
-    // Scroll to bottom
-    logContainer.scrollTop = logContainer.scrollHeight;
-  }
-
-  // Fight link functionality
+  // Initialize the fight
   fightLink.addEventListener('click', function (e) {
     e.preventDefault();
-    // Initialize the fight
     initializeBattle();
   });
 
-  // Handle fight button click
   document.querySelector('.fight-section__fight-button').addEventListener('click', function () {
     const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
     if (!currentCharacter) {
-      // User is not logged in, show login form
       showForm(loginForm);
     } else {
-      // User is logged in, start the fight
       initializeBattle();
     }
   });
 
-  function updateCharacterScore(characterName, result) {
-    const scores = getCharacterScores();
+  // function updateCharacterScore(characterName, result) {
+  //   const scores = getCharacterScores();
 
-    // Initialize character's score record if it doesn't exist
-    if (!scores[characterName]) {
-      scores[characterName] = {
-        Win: '0',
-        Loss: '0'
-      };
-    }
+  //   // Initialize character's score record
+  //   if (!scores[characterName]) {
+  //     scores[characterName] = {
+  //       Win: '0',
+  //       Loss: '0'
+  //     };
+  //   }
 
-    // Increment the appropriate counter
-    const currentValue = parseInt(scores[characterName][result]) || 0;
-    scores[characterName][result] = (currentValue + 1).toString();
+  //   // Increment the appropriate counter
+  //   const currentValue = parseInt(scores[characterName][result]) || 0;
+  //   scores[characterName][result] = (currentValue + 1).toString();
+  //   localStorage.setItem('nfcCharacterScore', JSON.stringify(scores));
 
-    // Save updated scores
-    localStorage.setItem('nfcCharacterScore', JSON.stringify(scores));
-
-    console.log(`Updated score for ${characterName}: ${JSON.stringify(scores[characterName])}`);
-  }
+  //   console.log(`Updated score for ${characterName}: ${JSON.stringify(scores[characterName])}`);
+  // }
 
   // Fight End
+
+  // Handle login/logout link
+  
+  document.querySelector('.login-link').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
+    if (currentCharacter) {
+      sessionStorage.removeItem('nfcCurrentCharacter');
+      sessionStorage.removeItem('nfcActiveMenuItem');
+    }
+    checkLoginState();
+  });
+
 
   // Form functionality
 
@@ -1230,11 +1222,9 @@ document.addEventListener('DOMContentLoaded', function () {
       f.classList.remove('active');
     });
 
-    // Show the selected form
     form.classList.add('active');
     if (focus) {
       form.querySelector(focus).focus();
-      // form.querySelector('.form__input').focus();
     }
 
   }
@@ -1272,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => {
         showForm(createForm);
         document.getElementById('create-name').value = name;
-      }, formCloseTimeout);
+      }, FORM_CLOSE_TIMEOUT);
       return;
     }
 
@@ -1285,20 +1275,19 @@ document.addEventListener('DOMContentLoaded', function () {
     loginMessage.textContent = '';
     loginForm.classList.remove('active');
 
-    // Update UI for logged in state
     document.querySelector('.login-link').textContent = 'Logout';
     document.querySelector('.fight-link').classList.remove('hidden');
     document.querySelector('.score-link').classList.remove('hidden');
     document.querySelector('.settings-link').classList.remove('hidden');
-
-    // Store current user
-    sessionStorage.setItem('nfcCurrentCharacter', name);
     activeItemDisplay.textContent = 'Login';
+
+    sessionStorage.setItem('nfcCurrentCharacter', name);
 
     initializeBattle();
   });
 
   // Create character functionality
+
   const createForm = document.querySelector('.create-form');
   const createButton = document.querySelector('.create-button');
   const createMessage = document.querySelector('.create-message');
@@ -1341,23 +1330,10 @@ document.addEventListener('DOMContentLoaded', function () {
     addCharacter(name, password);
     createMessage.textContent = 'Character created successfully';
 
-    // Clear form and show login form
     setTimeout(() => {
       createMessage.textContent = '';
       showForm(loginForm, '.login-name');
-    }, formCloseTimeout);
-  });
-
-  // Handle login/logout link
-  document.querySelector('.login-link').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
-    if (currentCharacter) {
-      sessionStorage.removeItem('nfcCurrentCharacter');
-      sessionStorage.removeItem('nfcActiveMenuItem');
-    }
-    checkLoginState();
+    }, FORM_CLOSE_TIMEOUT);
   });
 
   // Settings functionality
@@ -1396,7 +1372,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
 
-    // Populate score form with character data
     populateScoreForm(currentCharacter);
 
     showForm(scoreForm, '.form__close');
@@ -1410,7 +1385,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentCharacter = sessionStorage.getItem('nfcCurrentCharacter');
     if (currentCharacter) {
       // Populate character form with current user data
-      // document.getElementById('character-name').value = currentCharacter;
       document.querySelector('.edit-character-name').value = currentCharacter;
 
       // Get password and pre-fill password fields with asterisks if exists
@@ -1418,12 +1392,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const currentPassword = passwords[currentCharacter];
 
       if (currentPassword) {
-        const maskedPassword = '*'.repeat(currentPassword.length);
-        // document.getElementById('character-password').value = maskedPassword;
-        document.querySelector('.edit-character-password').value = maskedPassword;
-        document.querySelector('.edit-character-repeat-password').value = maskedPassword;
+        document.querySelector('.edit-character-password').value = currentPassword;
+        document.querySelector('.edit-character-repeat-password').value = currentPassword;
 
-        // Store original password in a data attribute for later use
+        // Store original password
         document.querySelector('.edit-character-password').dataset.originalPassword = currentPassword;
       } else {
         document.querySelector('.edit-character-password').value = '';
@@ -1556,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', function () {
       delete passwordField.dataset.originalPassword;
       characterMessage.textContent = '';
       characterForm.classList.remove('active');
-    }, formCloseTimeout);
+    }, FORM_CLOSE_TIMEOUT);
   });
 
   // Select avatar
@@ -1698,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         selectButton.addEventListener('click', function (e) {
-          e.stopPropagation(); // Prevent the card click event
+          e.stopPropagation();
           document.querySelectorAll('.enemy-card').forEach(card => {
             card.classList.remove('selected');
           });
@@ -1731,7 +1703,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('.select-enemy-button').addEventListener('click', function () {
     console.log('Select Enemy button clicked');
     try {
-      // Load enemies and show the form
       loadEnemies();
       showForm(enemyForm, '.form__close');
     } catch (error) {

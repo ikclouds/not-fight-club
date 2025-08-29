@@ -157,15 +157,6 @@
 
 /* Main Content */
 
-.section {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-  padding-top: 5rem;
-}
 
 /* Fight Start */
 
@@ -175,8 +166,8 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 2rem;
-    padding-top: 5rem;
+    /* padding: 2rem;
+    padding-top: 5rem; */
 }
 
 .fight-section {
@@ -251,14 +242,15 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 80vh;
+  height: 90vh;
+  margin-top: 20px;
 }
 
 .battle-panel {
   z-index: 1000;
   display: flex;
   justify-content: space-between;
-  height: 75%;
+  height: 80%;
   padding: 20px;
 }
 
@@ -407,7 +399,8 @@
   display: flex;
   flex-direction: column;
   height: 25%;
-  padding: 10px;
+  margin: 0 40px;
+  /* padding: 10px; */
   background-color: var(--log-bg-color);
   border-top: 1px solid #ddd;
   overflow: hidden;
@@ -416,13 +409,13 @@
 .log-container {
   flex: 1;
   overflow-y: auto;
-  padding: 5px;
+  padding: 0px 5px;
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .log-entry {
-  padding: 5px;
+  padding: 4px 5px;
   border-bottom: 1px solid #eee;
 }
 
@@ -595,8 +588,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* margin-top: 1.5rem; */
-  /* margin-left: 10px; */
 }
 
 .form__button {
@@ -717,7 +708,7 @@
   gap: 20px;
 }
 
-.form__imagegroup {
+.form__image-group {
   width: 40%;
 }
 
