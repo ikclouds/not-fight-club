@@ -33,12 +33,22 @@ function initEvents() {
     console.log(e.type, e.detail);
   });
 
-  onNfcBus('nfc-ui', (e) => {
+  onNfcBus('nfc-ui-forms', (e) => {
     console.log(e.type, e.detail);
   });
 
-  nfcBus('nfc-events', { detail: 'Bus initialized' });
-  nfcBus('nfc-logging', { detail: 'Bus initialized' });
-  nfcBus('nfc-state', { detail: 'Bus initialized' });
-  nfcBus('nfc-ui', { detail: 'Bus initialized' });
+  onNfcBus('nfc-ui-fight', (e) => {
+    console.log(e.type, e.detail);
+  });
+
+  onNfcBus('nfc-fight', (e) => {
+    console.log(e.type, e.detail);
+  });
+
+  nfcBus('nfc-events', { detail: 'Event Bus initialized' });
+  nfcBus('nfc-logging', { detail: 'Logging Event Bus initialized' });
+  nfcBus('nfc-state', { detail: 'State Event Bus initialized' });
+  nfcBus('nfc-ui-forms', { detail: 'UI Forms Event Bus initialized' });
+  nfcBus('nfc-ui-fight', { detail: 'UI Fight Event Bus initialized' });
+  nfcBus('nfc-fight', { detail: 'UI Fight Event Bus initialized' });
 }

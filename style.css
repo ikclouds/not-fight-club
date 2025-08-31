@@ -657,7 +657,7 @@
 /* Score form */
 
 .score-form .form {
-  max-height: 80%;
+  max-height: 90%;
   max-width: 500px;
   overflow-y: auto;
 }

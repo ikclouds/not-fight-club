@@ -7,15 +7,16 @@ export const APP_NAME = 'Not Fight Club';
 export const APP_VERSION = '1.0.0';
 
 // Burger menu
-export const burgerWidth = 1440; // Width threshold for burger menu
+export const BURGER_WIDTH = 1440; // Width threshold for burger menu
 
 // Form defaults
 export const FORM_CLOSE_TIMEOUT = 1000;
-export const FIGHT_TIMEOUT = 200;
+export const ATTACK_TIMEOUT = 200;
 
 // Fight settings
 
 // Zone requirements
+export const FIGHT_ZONES = ['Head', 'Neck', 'Body', 'Belly', 'Legs'];
 export const REQUIRED_ATTACK_ZONES = 1;
 export const REQUIRED_DEFENSE_ZONES = 2;
 
