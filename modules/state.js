@@ -52,8 +52,11 @@ export function initState() {
   if (!localStorage.getItem('nfcEnemies')) {
     localStorage.setItem('nfcEnemies',
       JSON.stringify({
-        Spacemarine: `${SPACEMARINE_HP}`,
-        Snowtroll: `${SNOWTROLL_HP}`,
+        Demort: `${SPACEMARINE_HP}`,
+        Bellatrix: `${SNOWTROLL_HP}`,
+        Lucius: `${SNOWTROLL_HP}`,
+        Severus: `${SNOWTROLL_HP}`,
+        Draco: `${SPIDER_HP}`,
         Spider: `${SPIDER_HP}`
       }));
   }
@@ -82,7 +85,6 @@ export function initState() {
   if (!localStorage.getItem('nfcEnemyCH')) {
     const enemy = getSelectedEnemyName();
     localStorage.setItem('nfcEnemyCH', `${ENEMY_CRITICAL_HITS[enemy] || 1}`);
-    // localStorage.setItem('nfcCharacterCH', DEFAULT_CHARACTER_CH.toString());
   }
 
   // Double Hits (DH)
@@ -203,7 +205,6 @@ export function setSelectedEnemy(name, hp) {
   setEnemyCH(ENEMY_CRITICAL_HITS[name] || 1);
   setEnemyDH(ENEMY_DOUBLE_HITS[name] || 0);
 
-  // TODO: UI
   updateEnemyInBattle(name, hp);
   updateCriticalHitDisplay();
   updateDoubleHitDisplay();
@@ -235,7 +236,6 @@ export function setCurrentCharacter(name) {
   else
     sessionStorage.removeItem('nfcCurrentCharacter');
 
-  // stateBus.dispatchEvent(new Event('auth:changed'));
   nfcBus('nfc-state', { detail: `Current Character changed: ${name}` });
 }
 
@@ -277,25 +277,18 @@ export function deleteActiveMenuItem() {
 
 export const getCharacterHP = () =>
   parseInt(localStorage.getItem('nfcCharacterHP'));
-// parseInt(localStorage.getItem('nfcCharacterHP') || `${CHARACTER_HP}`);
 
 export const getEnemyHP = () =>
   parseInt(localStorage.getItem('nfcEnemyHP'));
-// parseInt(localStorage.getItem('nfcEnemyHP') || `${getSelectedEnemyHP()}`);
 
 export function setCharacterHP(hp) {
-  // if (hp)
   localStorage.setItem('nfcCharacterHP', String(hp));
-  // else
-  //   localStorage.setItem('nfcCharacterHP', `${CHARACTER_HP}`);
 
   nfcBus('nfc-state', { detail: `Character HP changed: hp: ${hp}` });
 }
 
 export function setEnemyHP(hp) {
   localStorage.setItem('nfcEnemyHP', String(hp));
-  // else
-  //   localStorage.setItem('nfcEnemyHP', `${DEFAULT_ENEMY_HP}`);
 
   nfcBus('nfc-state', { detail: `enemy HP changed: hp: ${hp}` });
 }
@@ -317,17 +310,12 @@ export const getEnemyCH = () =>
 
 export function setCharacterCH(count) {
   localStorage.setItem('nfcCharacterCH', String(count));
-  // else
-  //   localStorage.setItem('nfcCharacterCH', `${DEFAULT_CHARACTER_CH}`);
 
   nfcBus('nfc-state', { detail: `Character CH changed: ${count}` });
 }
 
 export function setEnemyCH(count) {
-  // if (count)
   localStorage.setItem('nfcEnemyCH', String(count));
-  // else
-  //   localStorage.setItem('nfcEnemyCH', `${ENEMY_CRITICAL_HITS[getSelectedEnemyName()] || DEFAULT_ENEMY_CH}`);
 
   nfcBus('nfc-state', { detail: `Enemy CH changed: ${count}` });
 }
@@ -348,19 +336,13 @@ export const getEnemyDH = () =>
 // DH Set-functions
 
 export function setCharacterDH(count) {
-  // if (count)
   localStorage.setItem('nfcCharacterDH', String(count));
-  // else
-  //   localStorage.setItem('nfcCharacterDH', `${DEFAULT_CHARACTER_DH}`);
 
   nfcBus('nfc-state', { detail: `Character DH changed: ${count}` });
 }
 
 export function setEnemyDH(count) {
-  // if (count)
   localStorage.setItem('nfcEnemyDH', String(count));
-  // else
-  //   localStorage.setItem('nfcEnemyDH', `${DEFAULT_ENEMY_DH}`);
 
   nfcBus('nfc-state', { detail: `Enemy DH changed: ${count}` });
 }

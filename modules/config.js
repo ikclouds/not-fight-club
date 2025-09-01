@@ -35,6 +35,16 @@ export const BLOCKED_CRITICAL_DAMAGE = 5;
 export const CRITICAL_HIT_CHANCE = 0.3; // 30% chance for a critical hit
 export const DOUBLE_HIT_CHANCE = 0.2;   // 20% chance for a double hit
 
+// Character settings
+// Sample avatar filenames
+export const avatarFiles = [
+  'avatar1.png',
+  'avatar2.png',
+  'avatar3.png',
+  'avatar4.png',
+  'avatar5.png'
+];
+
 // Enemy settings
 export const DEFAULT_ENEMY_NAME = 'Spacemarine';
 
@@ -42,8 +52,11 @@ export const DEFAULT_ENEMY_NAME = 'Spacemarine';
 export const DEFAULT_CHARACTER_CH = 3;
 export const DEFAULT_ENEMY_CH = 1;
 export const ENEMY_CRITICAL_HITS = {
-  'Spacemarine': 1,
-  'Snowtroll': 3,
+  'Demort': 1,
+  'Bellatrix': 3,
+  'Lucius': 3,
+  'Severus': 3,
+  'Draco': 1,
   'Spider': 1
 };
 
@@ -51,7 +64,10 @@ export const ENEMY_CRITICAL_HITS = {
 export const DEFAULT_CHARACTER_DH = 0;
 export const DEFAULT_ENEMY_DH = 0;
 export const ENEMY_DOUBLE_HITS = {
-  'Spacemarine': 0,
-  'Snowtroll': 0,
+  'Demort': 0,
+  'Bellatrix': 0,
+  'Lucius': 0,
+  'Severus': 0,
+  'Draco': -1,
   'Spider': -1 // -1 means all hits are double
 };

@@ -10,7 +10,8 @@ import {
   DEFAULT_CHARACTER_DH,
   ENEMY_CRITICAL_HITS,
   ENEMY_DOUBLE_HITS,
-  FORM_CLOSE_TIMEOUT
+  FORM_CLOSE_TIMEOUT,
+  avatarFiles
 } from './config.js';
 
 import { nfcBus } from './events.js';
@@ -446,14 +447,6 @@ const avatarsGrid = document.querySelector('.avatars-grid');
 function loadAvatars() {
   nfcBus('nfc-ui-forms', { detail: `Loading avatars...` });
   avatarsGrid.innerHTML = '';
-
-  // Sample avatar filenames - in a real app, these would be loaded from the server
-  const avatarFiles = [
-    'avatar1.png',
-    'avatar2.png',
-    'avatar3.png',
-    'avatar4.png'
-  ];
 
   avatarFiles.forEach(file => {
     const avatarOption = document.createElement('div');
