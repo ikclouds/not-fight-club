@@ -8,6 +8,7 @@
   --odd-bg-color: #f5f5f5;
   --fight-button-text-color: #f5f5f5;
   --score-character-text-color: #ff4c4c;
+  --character-text-color: #f5f5f5;
   --enemy-text-color: #ff4c4c;
 
   --form-bg-color: white;
@@ -16,6 +17,7 @@
   --hp-bar-bg: #ddd;
   --hp-bar-color: #2ecc71;
   --hp-bar-low: #e74c3c;
+  --hp-text-color: #f9f9f9;
   --log-bg-color: #f9f9f9;
   --log-fighter-color: #240474;
   --log-damage-color: #ff4c4c;
@@ -171,7 +173,7 @@
 }
 
 .fight-section {
-    background-image: url('https://source.unsplash.com/random/1920x1080/?fight');
+    background-image: url('./assets/img/cover.jpg');
     background-size: cover;
     background-position: center;
     color: var(--main-color);
@@ -268,12 +270,15 @@
   margin-bottom: 15px;
   font-size: 1.5rem;
   text-align: center;
+  color: var(--character-text-color);
 }
 
 .fight-image-container {
   margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
+  border-color: var(--button-color);
+  box-shadow: -2px 5px 5px 0px rgba(255, 76, 76, 0.8),  0 -2px 5px 5px  rgba(255, 76, 76, 0.8);
 }
 
 .character-image,
@@ -304,8 +309,10 @@
 }
 
 .hp-text {
+  font-weight: bold;
   font-size: 1rem;
   text-align: center;
+  color: var(--hp-text-color);
 }
 
 /* Battle controls panel */
@@ -370,6 +377,8 @@
 
 .attack-zone-item {
   margin-left: auto;
+  font-weight: bold;
+  color: var(--enemy-text-color)
 }
 
 .attack-button {

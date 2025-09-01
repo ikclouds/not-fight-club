@@ -196,8 +196,8 @@ export function updateHPDisplays() {
   const enemyMaxHP = parseInt(getSelectedEnemyHP());
 
   // Update text displays
-  document.querySelector('.character-hp-text').textContent = `${characterHP}/${characterMaxHP}`;
-  document.querySelector('.enemy-hp-text').textContent = `${enemyHP}/${enemyMaxHP}`;
+  document.querySelector('.character-hp-text').textContent = `${characterHP} / ${characterMaxHP}`;
+  document.querySelector('.enemy-hp-text').textContent = `${enemyHP} / ${enemyMaxHP}`;
 
   activeItemDisplay.textContent = 'Fight';
   sessionStorage.setItem('nfcActiveMenuItem', 'Fight');
