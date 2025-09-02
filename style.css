@@ -4,15 +4,19 @@
   --button-color: #ff4c4c;
   --button-hover-color: #e03e3e;
   --button-close-hover-color: #ddd;
+  --button-close-bg-color: #eee;
 
   --odd-bg-color: #f5f5f5;
   --fight-button-text-color: #f5f5f5;
   --score-character-text-color: #ff4c4c;
   --character-text-color: #f5f5f5;
   --enemy-text-color: #ff4c4c;
+  --rules-text-color: #333;
+  --rules-header-color: #8b4513;
 
   --form-bg-color: white;
   --blur-color: rgba(0, 0, 0, 0.1);
+  --blur-rules-color: rgba(0, 0, 0, 0.65);
   --margin-color: #333;
   --hp-bar-bg: #ddd;
   --hp-bar-color: #2ecc71;
@@ -29,6 +33,10 @@
   padding: 0;
   border: none;
   list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
 }
 
 .page {
@@ -203,6 +211,7 @@
 .fight-section__fight-button {
     padding: 15px 50px;
     height: 100px;
+    font-family: Roboto, sans-serif;
     font-size: 2rem;
     font-weight: bold;
     background-color: var(--button-color);
@@ -425,7 +434,7 @@
 
 .log-entry {
   padding: 4px 5px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--button-close-bg-color);
 }
 
 .log-entry.player-attack {
@@ -563,7 +572,7 @@
   font-size: 1.5rem;
   /* border: none; */
   border-radius: 50%;
-  background-color: #eee;
+  background-color: var(--button-close-bg-color);
   cursor: pointer;
 }
 
@@ -572,7 +581,7 @@
 }
 
 .form__title {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   text-align: center;
 }
 
@@ -972,4 +981,114 @@
   .navigation__burger {
     display: flex;
   }
+}
+
+/* Rules form */
+.rules-form .form {
+  width: 100%;
+  height: 100vh;
+  max-width: 100%;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background-color: var(--blur-rules-color);
+  color: var(--character-text-color);
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.rules-form__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game_rules_title {
+  margin-top: 10px;
+}
+
+.rules-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 90vh;
+  overflow: auto;
+}
+
+.rules-scroll {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 864px;
+  height: 978px;
+  max-height: 90vh;
+  max-width: 90%;
+  background-image: url('./assets/img/papyrus.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.rules-text {
+  position: absolute;
+  overflow-y: auto;
+  width: 70%;
+  height: 50%;
+  padding: 50px 20px;
+  font-family: 'Times New Roman', serif;
+  text-align: center;
+  color: var(--rules-text-color);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* For Webkit browsers (Chrome, Safari, Opera) */
+.rules-content::-webkit-scrollbar {
+  display: none; 
+}
+
+.rules-text h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: var(--rules-header-color);
+}
+
+.rules-text h3 {
+  margin: 15px 0;
+  font-size: 1.3rem;
+  color: var(--rules-header-color);
+}
+
+.rules-text p, .rules-text li {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.rules-text ol {
+  padding-left: 20px;
+}
+
+.rules-form .form__close {
+  z-index: 1200;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.8rem;
+  background-color: var(--button-close-bg-color);
+  color: var(--rules-text-color);
 }

@@ -22,6 +22,7 @@ const burgerMenu = document.querySelector('.navigation__burger');
 const menu = document.querySelector('.navigation__menu');
 const overlay = document.querySelector('.page__overlay');
 const menuLinks = document.querySelectorAll('.navigation__link');
+const rulesForm = document.querySelector('.rules-form');
 
 // Toggle burger menu
 burgerMenu.addEventListener('click', function () {
@@ -74,7 +75,7 @@ function initMenu() {
 
       // Update active menu item display
       const linkText = this.textContent;
-      if (linkText !== 'Login' && linkText !== 'Logout') {
+      if (linkText !== 'Login' && linkText !== 'Logout' && linkText !== 'Rules') {
         activeItemDisplay.textContent = linkText;
         sessionStorage.setItem('nfcActiveMenuItem', linkText);
       }
@@ -84,6 +85,9 @@ function initMenu() {
       if (targetId === '#login') {
         closeGame();
         showForm(loginForm, '.login-name');
+        return;
+      } else if (targetId === '#rules') {
+        showForm(rulesForm);
         return;
       }
     });

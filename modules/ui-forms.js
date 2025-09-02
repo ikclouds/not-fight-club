@@ -54,7 +54,8 @@ export {
   showForm,
   loginForm,
   scoreForm,
-  populateScoreForm
+  populateScoreForm,
+  rulesForm
 };
 
 
@@ -64,6 +65,7 @@ export {
 
 // Helper form elements
 const closeBtns = document.querySelectorAll('.form__close');
+const rulesForm = document.querySelector('.rules-form');
 
 // Helper form function
 function showForm(form, focus) {
@@ -388,7 +390,7 @@ characterSaveButton.addEventListener('click', function () {
   let passwordToSave;
   const originalPassword = passwordField.dataset.originalPassword;
 
-  if ( password === originalPassword ) {
+  if (password === originalPassword) {
     passwordToSave = originalPassword;
   } else {
     passwordToSave = password;

@@ -25,6 +25,7 @@
         <li class="navigation__item fight-link hidden"><a href="#fight" class="navigation__link">Fight</a></li>
         <li class="navigation__item score-link hidden"><a href="#score" class="navigation__link">Score</a></li>
         <li class="navigation__item settings-link hidden"><a href="#settings" class="navigation__link">Settings</a></li>
+        <li class="navigation__item"><a href="#rules" class="navigation__link rules-link">Rules</a></li>
         <li class="navigation__item"><a href="#login" class="navigation__link login-link">Login</a></li>
       </ul>
       <div class="navigation__burger">
@@ -60,20 +61,30 @@
             <div class="zones-selection">
               <div class="attack-zones">
                 <h3>Attack Zones</h3>
-                <label class="attack-zone-item"><span>Head</span><input type="checkbox" name="attack" value="Head" id="attack-head"></label>
-                <label class="attack-zone-item"><span>Neck</span><input type="checkbox" name="attack" value="Neck" id="attack-neck"></label>
-                <label class="attack-zone-item"><span>Body</span><input type="checkbox" name="attack" value="Body" id="attack-body"></label>
-                <label class="attack-zone-item"><span>Belly</span><input type="checkbox" name="attack" value="Belly" id="attack-belly"></label>
-                <label class="attack-zone-item"><span>Legs</span><input type="checkbox" name="attack" value="Legs" id="attack-legs"></label>
+                <label class="attack-zone-item"><span>Head</span><input type="checkbox" name="attack" value="Head"
+                    id="attack-head"></label>
+                <label class="attack-zone-item"><span>Neck</span><input type="checkbox" name="attack" value="Neck"
+                    id="attack-neck"></label>
+                <label class="attack-zone-item"><span>Body</span><input type="checkbox" name="attack" value="Body"
+                    id="attack-body"></label>
+                <label class="attack-zone-item"><span>Belly</span><input type="checkbox" name="attack" value="Belly"
+                    id="attack-belly"></label>
+                <label class="attack-zone-item"><span>Legs</span><input type="checkbox" name="attack" value="Legs"
+                    id="attack-legs"></label>
               </div>
               <div class="fight-margin"></div>
               <div class="defense-zones">
                 <h3>Defense Zones</h3>
-                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Head" id="defense-head"> <span>Head</span></label>
-                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Neck" id="defense-neck"> <span>Neck</span></label>
-                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Body" id="defense-body"> <span>Body</span></label>
-                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Belly" id="defense-belly"><span>Belly</span></label>
-                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Legs" id="defense-legs"> <span>Legs</span></label>
+                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Head" id="defense-head">
+                  <span>Head</span></label>
+                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Neck" id="defense-neck">
+                  <span>Neck</span></label>
+                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Body" id="defense-body">
+                  <span>Body</span></label>
+                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Belly"
+                    id="defense-belly"><span>Belly</span></label>
+                <label class="defense-zone-item"><input type="checkbox" name="defense" value="Legs" id="defense-legs">
+                  <span>Legs</span></label>
               </div>
             </div>
             <button class="attack-button" type="button">Attack</button>
@@ -200,45 +211,46 @@
     <div class="form">
       <button class="form__close">&times;</button>
       <h1 class="form__title">Edit Character</h1>
-        <div class="character__fields">
-          <div class="character__text">
-            <div class="form__group">
-              <label for="character-name" class="form__label">Character Name
-                <input type="text" class="form__input edit-character-name">
-              </label>
-            </div>
-            <div class="form__group">
-              <label for="character-password" class="form__label">Password
-                <input type="password" class="form__input edit-character-password">
-              </label>
-            </div>
-            <div class="form__group">
-              <label for="character-repeat-password" class="form__label">Repeat Password
-                <input type="password" class="form__input edit-character-repeat-password">
-              </label>
-            </div>
-            <div class="form__group">
-              <label for="character-ch" class="form__label">Critical Hits
-                <input type="number" min="0" max="10" class="form__input edit-character-ch">
-              </label>
-            </div>
-            <div class="form__group">
-              <label for="character-dh" class="form__label">Double Hits
-                <input type="number" min="-1" max="10" class="form__input edit-character-dh">
-              </label>
-            </div>
+      <div class="character__fields">
+        <div class="character__text">
+          <div class="form__group">
+            <label for="character-name" class="form__label">Character Name
+              <input type="text" class="form__input edit-character-name">
+            </label>
           </div>
-          <div class="form__image-group">
-            <label class="form__label">Avatar
-              <div class="avatar-container">
-                <img src="./assets/img/avatars/default.png" alt="Character Avatar" id="character-avatar" class="avatar-image">
-                <button class="avatar-edit-button">
-                  <img src="./assets/svg/edit.svg" alt="Edit" class="edit-icon">
-                </button>
-              </div>
+          <div class="form__group">
+            <label for="character-password" class="form__label">Password
+              <input type="password" class="form__input edit-character-password">
+            </label>
+          </div>
+          <div class="form__group">
+            <label for="character-repeat-password" class="form__label">Repeat Password
+              <input type="password" class="form__input edit-character-repeat-password">
+            </label>
+          </div>
+          <div class="form__group">
+            <label for="character-ch" class="form__label">Critical Hits
+              <input type="number" min="0" max="10" class="form__input edit-character-ch">
+            </label>
+          </div>
+          <div class="form__group">
+            <label for="character-dh" class="form__label">Double Hits
+              <input type="number" min="-1" max="10" class="form__input edit-character-dh">
             </label>
           </div>
         </div>
+        <div class="form__image-group">
+          <label class="form__label">Avatar
+            <div class="avatar-container">
+              <img src="./assets/img/avatars/default.png" alt="Character Avatar" id="character-avatar"
+                class="avatar-image">
+              <button class="avatar-edit-button">
+                <img src="./assets/svg/edit.svg" alt="Edit" class="edit-icon">
+              </button>
+            </div>
+          </label>
+        </div>
+      </div>
       <div class="form__actions">
         <button class="form__button character-save-button">Save</button>
       </div>
@@ -267,6 +279,46 @@
       </div>
       <div class="form__actions">
         <button class="form__button enemy-save-button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules Form -->
+  <div class="form_container rules-form">
+    <div class="form rules-form__container">
+      <button class="form__close">&times;</button>
+      <h1 class="form__title game_rules_title">Game Rules</h1>
+      <div class="rules-content">
+        <div class="rules-scroll">
+          <div class="rules-text">
+            <h2>Welcome to Not Fight Club</h2>
+            <p>The first rule of Not Fight Club is you DO talk about Not Fight Club!</p>
+
+            <h3>Basic Rules:</h3>
+            <ol>
+              <li>Each player has a character with HP (Hit Points).</li>
+              <li>Players take turns attacking each other.</li>
+              <li>Each attack targets a specific zone (Head, Neck, Body, Belly, Legs).</li>
+              <li>Players can defend up to two zones each turn.</li>
+              <li>If an attack hits an undefended zone, the defender loses HP.</li>
+              <li>The battle continues until one player's HP reaches zero.</li>
+            </ol>
+
+            <h3>Special Attacks:</h3>
+            <p><strong>Critical Hits:</strong> Each character has a limited number of critical hits that deal extra
+              damage.</p>
+            <p><strong>Double Hits:</strong> Some characters can attack twice in one turn.</p>
+
+            <h3>How to Play:</h3>
+            <ol>
+              <li>Select one Attack Zone by checking the appropriate checkbox.</li>
+              <li>Select two Defense Zones to protect against enemy attacks.</li>
+              <li>Click the Attack button to execute your move.</li>
+              <li>The enemy will then make their move.</li>
+              <li>Continue until victory or defeat!</li>
+            </ol>
+          </div>
+        </div>
       </div>
     </div>
   </div>
