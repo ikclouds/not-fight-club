@@ -53,10 +53,10 @@ export function initState() {
     localStorage.setItem('nfcEnemies',
       JSON.stringify({
         Demort: `${SPACEMARINE_HP}`,
-        Bellatrix: `${SNOWTROLL_HP}`,
-        Lucius: `${SNOWTROLL_HP}`,
-        Severus: `${SNOWTROLL_HP}`,
-        Draco: `${SPIDER_HP}`,
+        Bellax: `${SNOWTROLL_HP}`,
+        Lucis: `${SNOWTROLL_HP}`,
+        Sevus: `${SNOWTROLL_HP}`,
+        Draggo: `${SPIDER_HP}`,
         Spider: `${SPIDER_HP}`
       }));
   }

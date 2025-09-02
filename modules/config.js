@@ -53,10 +53,10 @@ export const DEFAULT_CHARACTER_CH = 3;
 export const DEFAULT_ENEMY_CH = 1;
 export const ENEMY_CRITICAL_HITS = {
   'Demort': 1,
-  'Bellatrix': 3,
-  'Lucius': 3,
-  'Severus': 3,
-  'Draco': 1,
+  'Bellax': 3,
+  'Lucis': 3,
+  'Sevus': 3,
+  'Draggo': 1,
   'Spider': 1
 };
 
@@ -65,9 +65,9 @@ export const DEFAULT_CHARACTER_DH = 0;
 export const DEFAULT_ENEMY_DH = 0;
 export const ENEMY_DOUBLE_HITS = {
   'Demort': 0,
-  'Bellatrix': 0,
-  'Lucius': 0,
-  'Severus': 0,
-  'Draco': -1,
+  'Bellax': 0,
+  'Lucis': 0,
+  'Sevus': 0,
+  'Draggo': -1,
   'Spider': -1 // -1 means all hits are double
 };
