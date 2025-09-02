@@ -185,6 +185,10 @@
           <img src="./assets/svg/select-enemy.svg" alt="Enemy" class="button-icon">
           <div>Select Enemy</div>
         </button>
+        <button class="form__button game-settings-button">
+          <img src="./assets/svg/settings.svg" alt="Settings" class="button-icon">
+          <div>Game Settings</div>
+        </button>
       </div>
     </div>
   </div>
@@ -280,6 +284,25 @@
       <div class="form__actions">
         <button class="form__button enemy-save-button">Save</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Game Settings Form -->
+  <div class="form_container game-settings-form">
+    <div class="form">
+      <button class="form__close">&times;</button>
+      <h1 class="form__title">Game Settings</h1>
+      <div class="form__group">
+        <label class="form__label checkbox-label">
+          <input type="checkbox" class="form__checkbox random-enemy-checkbox">
+          Random enemy after each fight
+        </label>
+        <p class="form__description">When enabled, a random enemy will be selected after each battle</p>
+      </div>
+      <div class="form__actions">
+        <button class="form__button game-settings-save-button">Save</button>
+      </div>
+      <div class="form__message game-settings-message"></div>
     </div>
   </div>
 

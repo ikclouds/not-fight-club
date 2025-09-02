@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Game settings">
+  <defs>
+    <!-- mask: white = visible, black = transparent (creates inner transparent circle) -->
+    <mask id="gearHoleMask">
+      <rect width="100%" height="100%" fill="white"/>
+      <circle cx="32" cy="32" r="12" fill="black"/>
+    </mask>
+  </defs>
+
+  <!-- gear body + teeth (teeth slightly sunk into the circumference). Teeth are rectangular (wider than deep). -->
+  <g fill="#000" mask="url(#gearHoleMask)">
+    <!-- larger gear body -->
+    <circle cx="32" cy="32" r="22" />
+
+    <!-- 8 rectangular teeth.
+         Tooth geometry: width = 14 (tangent direction), depth = 8 (radial).
+         Positioned so inner edge sinks ~4px inside the gear circumference.
+    -->
+    <rect x="25" y="4"  width="14" height="8" rx="1"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(45 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(90 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(135 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(180 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(225 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(270 32 32)"/>
+    <rect x="25" y="4"  width="14" height="8" rx="1" transform="rotate(315 32 32)"/>
+  </g>
+</svg>

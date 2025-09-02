@@ -95,6 +95,10 @@ export function initState() {
     const enemy = getSelectedEnemyName();
     localStorage.setItem('nfcEnemyDH', `${ENEMY_DOUBLE_HITS[enemy] || 0}`);
   }
+
+  // Game Settings
+  if (!localStorage.getItem('nfcSettingRandomEnemy'))
+    localStorage.setItem('nfcSettingRandomEnemy', 'false');
 }
 
 
@@ -345,4 +349,19 @@ export function setEnemyDH(count) {
   localStorage.setItem('nfcEnemyDH', String(count));
 
   nfcBus('nfc-state', { detail: `Enemy DH changed: ${count}` });
+}
+
+
+/** 
+ * Game Settings
+ */
+
+// Game settings Get-functions
+export const getRandomEnemyEnabled = () =>
+  localStorage.getItem('nfcSettingRandomEnemy') === 'true';
+
+// Game settings Set-functions
+export function setRandomEnemyEnabled(enabled) {
+  localStorage.setItem('nfcSettingRandomEnemy', enabled.toString());
+  nfcBus('nfc-state', { detail: `Random enemy setting changed: ${enabled}` });
 }

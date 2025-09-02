@@ -43,7 +43,10 @@ import {
   setEnemyDH,
   setEnemyHP,
   updateCharacterScore,
-  getBattleState
+  getBattleState,
+  getRandomEnemyEnabled,
+  getEnemies,
+  setSelectedEnemy
 } from './state.js';
 
 import {
@@ -515,6 +518,11 @@ function endBattle(resultMessage) {
   setEnemyCH(ENEMY_CRITICAL_HITS[selectedEnemyName] || 1);
   setEnemyDH(ENEMY_DOUBLE_HITS[selectedEnemyName] || 0);
 
+  // Check if random enemy is enabled and select a new enemy if it is
+  if (getRandomEnemyEnabled()) {
+    selectRandomEnemy();
+  }
+
   hideBattleUI();
   addLogEntry('Press Fight to start a new battle', 'result');
   nfcBus('nfc-fight', { detail: `Press Fight to start a new battle` });
@@ -524,4 +532,20 @@ function endBattle(resultMessage) {
   scoreTitle.innerHTML = resultMessage;
   populateScoreForm(currentCharacter);
   showForm(scoreForm, '.form__close');
+}
+
+// Helper function to select a random enemy
+function selectRandomEnemy() {
+  const enemies = getEnemies();
+  const enemyNames = Object.keys(enemies);
+
+  // Select a random enemy
+  const randomIndex = Math.floor(Math.random() * enemyNames.length);
+  const randomEnemyName = enemyNames[randomIndex];
+  const randomEnemyHP = enemies[randomEnemyName];
+
+  // Set the selected enemy
+  setSelectedEnemy(randomEnemyName, randomEnemyHP);
+
+  nfcBus('nfc-fight', { detail: `Random enemy selected: ${randomEnemyName}` });
 }

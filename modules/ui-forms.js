@@ -35,7 +35,9 @@ import {
   setCharacterNames,
   setCharacterPasswords,
   getCurrentCharacter,
-  setCurrentCharacter
+  setCurrentCharacter,
+  getRandomEnemyEnabled,
+  setRandomEnemyEnabled
 } from './state.js'
 
 import {
@@ -624,4 +626,40 @@ selectEnemyButton.addEventListener('click', function () {
     console.error('Error showing enemy form:', error);
     alert('Could not load enemy selection. Check console for details.');
   }
+});
+
+
+/**
+* Game Settings
+*/
+
+// Game Settings form elements
+const gameSettingsForm = document.querySelector('.game-settings-form');
+const gameSettingsButton = document.querySelector('.game-settings-button');
+const gameSettingsSaveButton = document.querySelector('.game-settings-save-button');
+const randomEnemyCheckbox = document.querySelector('.random-enemy-checkbox');
+
+// Game Settings form event handlers
+gameSettingsButton.addEventListener('click', function () {
+  // Load current settings
+  randomEnemyCheckbox.checked = getRandomEnemyEnabled();
+
+  showForm(gameSettingsForm, '.form__close');
+  nfcBus('nfc-ui-forms', { detail: `Game Settings form opened` });
+});
+
+// Save game settings
+gameSettingsSaveButton.addEventListener('click', function () {
+  // Save random enemy setting
+  setRandomEnemyEnabled(randomEnemyCheckbox.checked);
+
+  const message = document.querySelector('.game-settings-message');
+  message.textContent = 'Settings saved successfully';
+
+  nfcBus('nfc-ui-forms', { detail: `Game Settings saved: randomEnemy=${randomEnemyCheckbox.checked}` });
+
+  setTimeout(() => {
+    message.textContent = '';
+    gameSettingsForm.classList.remove('active');
+  }, FORM_CLOSE_TIMEOUT);
 });
