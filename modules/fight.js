@@ -73,6 +73,7 @@ import {
 export {
   endBattle,
   checkBattleEnd,
+  clearPlayerDefenseZones,
   getSelectedAttackZone,
   initFight,
   initializeZoneSelection,
@@ -93,13 +94,16 @@ function initFight() {
  * Attack and Defense zone selection
  */
 
+const checkedPlayerDefenseZones = [];
+
 // Get selected defense zones
 function getSelectedDefenseZones() {
   return checkedPlayerDefenseZones;
 }
 
-// 
-const checkedPlayerDefenseZones = [];
+function clearPlayerDefenseZones() {
+  checkedPlayerDefenseZones.length = 0;
+}
 
 // Validate defense selection (only required number allowed)
 function validateDefenseSelection(e) {

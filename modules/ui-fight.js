@@ -47,6 +47,7 @@ import {
 import { loginForm, showForm } from './ui-forms.js';
 
 import {
+  clearPlayerDefenseZones,
   endBattle,
   initializeZoneSelection,
   getSelectedAttackZone,
@@ -139,6 +140,9 @@ function updateAttackButtonState(attackCount = null, defenseCount = null) {
   // If values not provided, calculate them
   if (attackCount === null) {
     attackCount = document.querySelectorAll('input[name="attack"]:checked').length;
+    if (attackCount === 0) {
+      clearPlayerDefenseZones();
+    }
   }
   if (defenseCount === null) {
     defenseCount = document.querySelectorAll('input[name="defense"]:checked').length;
