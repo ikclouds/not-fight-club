@@ -1,31 +1,46 @@
 :root {
+  /* Common UI */
   --bg-color: white;
   --main-color: black;
+  --margin-color: #333;
   --button-color: #ff4c4c;
   --button-hover-color: #e03e3e;
-  --button-close-hover-color: #ddd;
-  --button-close-bg-color: #eee;
 
-  --odd-bg-color: #f5f5f5;
+  /* Forms */
+  --form-bg-color: white;
+  --form-shadow-color: rgba(0, 0, 0, 0.3);
+  --form-blur-color: rgba(0, 0, 0, 0.1);
+  --form-white-overlay: rgba(255, 255, 255, 0.8);
+  --form-input-focus-color: #ccc;
+  --form-description-color: #666;
+  --form-error-color: red;
+  --button-close-bg-color: #eee;
+  --button-close-hover-color: #ddd;
+
+  /* Fight */
   --fight-button-text-color: #f5f5f5;
   --score-character-text-color: #ff4c4c;
   --character-text-color: #f5f5f5;
   --enemy-text-color: #ff4c4c;
-  --rules-text-color: #333;
-  --rules-header-color: #8b4513;
-
-  --form-bg-color: white;
-  --blur-color: rgba(0, 0, 0, 0.1);
-  --blur-rules-color: rgba(0, 0, 0, 0.65);
-  --margin-color: #333;
+  --enemy-shadow-color: rgba(255, 76, 76, 0.5);
   --hp-bar-bg: #ddd;
   --hp-bar-color: #2ecc71;
   --hp-bar-low: #e74c3c;
-  --hp-text-color: #f9f9f9;
-  --log-bg-color: #f9f9f9;
-  --log-fighter-color: #240474;
+  --hp-text-color: #f9f9f9;  
+  --rules-text-color: #333;
+  --rules-header-color: #8b4513;
+  --rules-blur-color: rgba(0, 0, 0, 0.65);
+  
+  /* Logging */
+  --log-bg-color: rgba(249, 249, 249, 0.9);
+  --log-border-color: #ddd;
+  --log-character-color: #240474;
   --log-damage-color: #ff4c4c;
+  --log-enemy-attack: #0b65a0;
+  --log-result-color: #2c3e50;
 }
+
+/* Common UI Start */
 
 * {
   box-sizing: border-box;
@@ -46,7 +61,12 @@ h1, h2, h3, h4, h5, h6 {
   overflow-x: hidden;
 }
 
+/* Common UI End */
+
+
 /* Header and Navigation Start */
+
+/* Header */
 
 .header {
   z-index: 1000;
@@ -112,6 +132,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Battle controls in header End */
 
+/* Main menu Start*/
+
 .navigation__menu {
   display: flex;
 }
@@ -128,7 +150,6 @@ h1, h2, h3, h4, h5, h6 {
 .navigation__link:hover {
   text-decoration: underline;
 }
-
 
 /* Burger Menu Icon */
 
@@ -150,6 +171,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Burger Menu Active (X) */
+
 .navigation_burger_active .burger__line:nth-child(1) {
   transform: translateY(9px) rotate(45deg);
 }
@@ -162,11 +184,12 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-9px) rotate(-45deg);
 }
 
+/* Main menu End */
+
 /* Header and Navigation End */
 
 
 /* Main Content */
-
 
 /* Fight Start */
 
@@ -176,8 +199,6 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    /* padding: 2rem;
-    padding-top: 5rem; */
 }
 
 .fight-section {
@@ -227,6 +248,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Battle controls in header */
+
 .battle-controls {
   display: flex;
   align-items: center;
@@ -249,6 +271,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Battle interface */
+
 .battle-interface {
   display: flex;
   flex-direction: column;
@@ -325,6 +348,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Battle controls panel */
+
 .battle-controls-panel {
   display: flex;
   flex-direction: column;
@@ -412,6 +436,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Logging panel */
+
 .logging-panel {
   z-index: 1000;
   display: flex;
@@ -420,7 +445,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 40px;
   /* padding: 10px; */
   background-color: var(--log-bg-color);
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--log-border-color);
   overflow: hidden;
 }
 
@@ -429,7 +454,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
   padding: 0px 5px;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.5;  
 }
 
 .log-entry {
@@ -442,12 +467,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .log-entry.enemy-attack {
-  color: #3498db;
+  color: var(--log-enemy-attack);
 }
 
 .log-entry.result {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--log-result-color);
 }
 
 .result-win,
@@ -457,7 +482,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .log_fighter {
   font-weight: bold;
-  color: var(--log-fighter-color);
+  color: var(--log-character-color);
 }
 
 .log_damage {
@@ -470,8 +495,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Critical Hit Styles */
+
 .critical-hit-count {
-  /* display: none; */
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
@@ -496,8 +521,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Double Hit Styles */
+
 .double-hit-count {
-  /* display: none; */
   margin-top: 5px;
   font-size: 0.9rem;
   text-align: center;
@@ -541,7 +566,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   display: none;
-  background-color: var(--blur-color);  
+  background-color: var(--form-blur-color);  
 }
 
 .form_container.active {
@@ -556,7 +581,7 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 500px;
   max-height: 600px;
   background-color: var(--form-bg-color);
-  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 5px 5px 15px var(--form-shadow-color);
   overflow-y: auto;
 }
 
@@ -570,7 +595,6 @@ h1, h2, h3, h4, h5, h6 {
   width: 30px;
   height: 30px;
   font-size: 1.5rem;
-  /* border: none; */
   border-radius: 50%;
   background-color: var(--button-close-bg-color);
   cursor: pointer;
@@ -598,7 +622,7 @@ h1, h2, h3, h4, h5, h6 {
 .form__input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--form-input-focus-color);
   border-radius: 4px;
 }
 
@@ -639,7 +663,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1rem;
   font-size: 0.9rem;
   text-align: center;
-  color: red;
+  color: var(--form-error-color);
 }
 
 /* Setting form */
@@ -744,7 +768,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 330px;
   margin: 0 auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--form-input-focus-color);
   border-radius: 8px;
   object-fit: cover;
   overflow: hidden;
@@ -766,7 +790,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--form-white-overlay);
   border: none;
   opacity: 0;
   transform: translate(-50%, -50%);
@@ -799,6 +823,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1rem;
   overflow-y: auto;
   margin-bottom: 40px;
+  padding: 5px;
 }
 
 .avatar-option {
@@ -814,6 +839,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .avatar-option:hover {
   border-color: var(--button-color);
+  box-shadow: -2px 3px 3px 0px rgba(255, 76, 76, 0.8),  0 -2px 3px 3px  rgba(255, 76, 76, 0.8);
 }
 
 .avatar-option-image {
@@ -833,7 +859,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 30px;
   border: none;
   border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--form-white-overlay);
   opacity: 0;
   transition: opacity 0.3s;
   cursor: pointer;
@@ -880,7 +906,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .enemy-card.selected {
     border-color: var(--button-color);
-    box-shadow: 0 0 10px rgba(255, 76, 76, 0.5);
+    box-shadow: 0 0 10px var(--enemy-shadow-color);
 }
 
 .enemy-card:hover {
@@ -921,7 +947,7 @@ h1, h2, h3, h4, h5, h6 {
     right: 8px;
     width: 30px;
     height: 30px;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--form-white-overlay);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -936,63 +962,8 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 1;
 }
 
-/* Forms End */
-
-/* Utility classes */
-.hidden {
-    display: none;
-}
-
-/* Overlay Start */
-
-.page__overlay {
-  z-index: 999;
-  position: fixed;
-  display: none;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--blur-color);
-}
-
-.page_overlay_active {
-    display: block;
-}
-
-/* Overlay End */
-
-/* Media Queries */
-@media (max-width: 1440px) {
-  
-  .navigation__menu {
-    position: fixed;
-    flex-direction: column;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100vh;
-    padding: 80px 30px 30px;
-    border-left: 2px solid var(--margin-color);
-    border-bottom: 2px solid var(--margin-color);
-    background-color: var(--bg-color);
-    transition: right 0.3s ease;
-  }
-
-  .navigation_menu_active {
-    right: 0;
-  }
-
-  .navigation__item {
-    margin: 1rem 0;
-  }
-
-  .navigation__burger {
-    display: flex;
-  }
-}
-
 /* Rules form */
+
 .rules-form .form {
   width: 100%;
   height: 100vh;
@@ -1001,7 +972,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
   border-radius: 0;
-  background-color: var(--blur-rules-color);
+  background-color: var(--rules-blur-color);
   color: var(--character-text-color);
   animation: slideDown 0.5s ease-out;
 }
@@ -1062,9 +1033,8 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-/* For Webkit browsers (Chrome, Safari, Opera) */
 .rules-content::-webkit-scrollbar {
-  display: none; 
+  display: none; /* Hide scrollbar for Webkit browsers (Chrome, Safari, Opera) */
 }
 
 .rules-text h2 {
@@ -1103,6 +1073,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Game Settings form */
+
 .game-settings-button {
   display: flex;
   flex-wrap: wrap;
@@ -1133,6 +1104,63 @@ h1, h2, h3, h4, h5, h6 {
 .form__description {
   margin-top: 5px;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--form-description-color);
   margin-left: 28px;
 }
+
+/* Forms End */
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+/* Overlay Start */
+
+.page__overlay {
+  z-index: 999;
+  position: fixed;
+  display: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--form-blur-color);
+}
+
+.page_overlay_active {
+    display: block;
+}
+
+/* Overlay End */
+
+/* Media Queries */
+@media (max-width: 1440px) {
+  
+  .navigation__menu {
+    position: fixed;
+    flex-direction: column;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100vh;
+    padding: 80px 30px 30px;
+    border-left: 2px solid var(--margin-color);
+    border-bottom: 2px solid var(--margin-color);
+    background-color: var(--bg-color);
+    transition: right 0.3s ease;
+  }
+
+  .navigation_menu_active {
+    right: 0;
+  }
+
+  .navigation__item {
+    margin: 1rem 0;
+  }
+
+  .navigation__burger {
+    display: flex;
+  }
+}
+
